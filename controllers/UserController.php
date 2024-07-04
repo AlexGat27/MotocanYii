@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\LoginForm;
 use app\models\RegisterForm;
+use app\models\User;
 use Yii;
 use yii\web\Response;
 use yii\web\Controller;
@@ -21,23 +22,7 @@ class UserController extends Controller
                 'application/json' => Response::FORMAT_JSON,
             ],
         ];
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::class,
-            'cors' => [
-                // restrict access to
-                'Origin' => ['http://localhost:5173', 'http://localhost:8080'],
-                // Allow only POST and PUT methods
-                'Access-Control-Request-Method' => ['POST', 'GET', 'OPTIONS'],
-                // Allow only headers 'X-Wsse'
-                'Access-Control-Request-Headers' => ['*'],
-                // Allow credentials (cookies, authorization headers, etc.) to be exposed to the browser
-                'Access-Control-Allow-Credentials' => true,
-                // Allow OPTIONS caching
-                'Access-Control-Max-Age' => 3600,
-                // Allow the X-Pagination-Current-Page header to be exposed to the browser.
-                'Access-Control-Expose-Headers' => [],
-            ],
-        ];
+
         return $behaviors;
     }
     public function actionRegister()
@@ -65,15 +50,16 @@ class UserController extends Controller
         $model->username = Yii::$app->request->post('username');
         $model->password = Yii::$app->request->post('password');
         $model->reCaptcha = Yii::$app->request->post('reCaptcha');
-
         if ($model->login()) {
             return [
                 'success' => true,
                 'message' => 'Login successful.',
+                'user' => Yii::$app->user->identity,
             ];
         }
 
         return [
+            Yii::$app->response->statusCode = 401,
             'success' => false,
             'errors' => $model->errors,
         ];
@@ -81,5 +67,20 @@ class UserController extends Controller
 
     public function actionLogout(){
         Yii::$app->user->logout();
+    }
+
+    public function actionCheckAuth()
+    {
+        $session = Yii::$app->session;
+        $sessionId = $session->getId();
+        Yii::info("Current session ID: $sessionId");
+        if (Yii::$app->user->isGuest) {
+            return ['status' => 'unauthorized'];
+        }
+
+        return [
+            'status' => 'authorized',
+            'user' => Yii::$app->user->identity,
+        ];
     }
 }

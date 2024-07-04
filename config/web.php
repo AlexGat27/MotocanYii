@@ -15,10 +15,9 @@ $config = [
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             //'cookieValidationKey' => 'Rr2lzTCm-rjDUZZF6L9PvLja1nBO47vX',
-            'enableCookieValidation' => false, // Отключаем валидацию cookie, так как не используем cookie
-            'enableCsrfValidation' => false, // Отключаем CSRF-защиту, так как не используем cookie
+            'enableCookieValidation' => false,
+            'enableCsrfValidation' => false,
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ]
@@ -29,6 +28,7 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'enableSession' => true,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -57,6 +57,7 @@ $config = [
                 'POST api/v1/register' => 'user/register',
                 'POST api/v1/login' => 'user/login',
                 'GET api/v1/logout' => 'user/logout',
+                'GET api/v1/check-auth' => 'user/check-auth',
             ],
         ],
         'reCaptcha' => [
@@ -64,19 +65,36 @@ $config = [
             'siteKey' => '6LcjPgYqAAAAACr4ePwNSFNq-GKm-9xHl9ccqd-k',
             'secret' => '6LcjPgYqAAAAAOy0rdIzCW1c2KkLkFTU_kMt4x4k'
         ],
+        'session' => [
+            'class' => 'yii\web\Session',
+            'savePath' => '@runtime/sessions',
+            'useCookies' => true,
+            'cookieParams' => [
+                'httpOnly' => false,
+                'secure' => false,
+                'sameSite' => \yii\web\Cookie::SAME_SITE_NONE,
+            ],
+        ],
     ],
     'as corsFilter' => [
         'class' => Cors::class,
         'cors' => [
             'Origin' => ['http://localhost:5173'],
-            'Access-Control-Request-Method' => ['POST', 'GET', 'OPTIONS'],
-            'Access-Control-Request-Headers' => ['*'],
+            'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
             'Access-Control-Allow-Credentials' => true,
             'Access-Control-Max-Age' => 3600,
+            'Access-Control-Allow-Headers' => ['Content-Type', 'Authorization', 'X-Requested-With'],
             'Access-Control-Expose-Headers' => [],
         ],
     ],
     'params' => $params,
+    'on beforeSend' => function ($event) {
+        $response = $event->sender;
+        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:5173');
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    },
 ];
 
 if (YII_ENV_DEV) {
