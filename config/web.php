@@ -15,7 +15,7 @@ $config = [
     ],
     'components' => [
         'request' => [
-            //'cookieValidationKey' => 'Rr2lzTCm-rjDUZZF6L9PvLja1nBO47vX',
+            //'cookieValidationKey' => Yii::$app->security->generateRandomString(),
             'enableCookieValidation' => false,
             'enableCsrfValidation' => false,
             'parsers' => [
@@ -72,29 +72,33 @@ $config = [
             'cookieParams' => [
                 'httpOnly' => false,
                 'secure' => false,
-                'sameSite' => \yii\web\Cookie::SAME_SITE_NONE,
+                'sameSite' => \yii\web\Cookie::SAME_SITE_STRICT,
             ],
         ],
     ],
     'as corsFilter' => [
-        'class' => Cors::class,
-        'cors' => [
-            'Origin' => ['http://localhost:5173'],
-            'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-            'Access-Control-Allow-Credentials' => true,
-            'Access-Control-Max-Age' => 3600,
-            'Access-Control-Allow-Headers' => ['Content-Type', 'Authorization', 'X-Requested-With'],
-            'Access-Control-Expose-Headers' => [],
-        ],
+        'class' => \yii\filters\Cors::class,
+        'only' => ['api/*'],
     ],
+//    'as corsFilter' => [
+//        'class' => Cors::class,
+//        'cors' => [
+//            'Origin' => ['http://localhost:5173'],
+//            'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//            'Access-Control-Allow-Credentials' => true,
+//            'Access-Control-Max-Age' => 3600,
+//            'Access-Control-Allow-Headers' => ['Content-Type', 'Authorization', 'X-Requested-With'],
+//            'Access-Control-Expose-Headers' => [],
+//        ],
+//    ],
     'params' => $params,
-    'on beforeSend' => function ($event) {
-        $response = $event->sender;
-        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:5173');
-        $response->headers->set('Access-Control-Allow-Credentials', 'true');
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    },
+//    'on beforeSend' => function ($event) {
+//        $response = $event->sender;
+//        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:5173');
+//        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+//        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//        $response->headers->set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+//    },
 ];
 
 if (YII_ENV_DEV) {

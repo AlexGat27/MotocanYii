@@ -17,6 +17,7 @@ class RegisterForm extends Model
     {
         return [
             [['username', 'password'], 'required'],
+            ['username', 'validateUsername'],
             ['username', 'string', 'min' => 3, 'max' => 255],
             ['password', 'string', 'min' => 6],
         ];
@@ -47,5 +48,9 @@ class RegisterForm extends Model
         $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$token");
         $result = json_decode($response, true);
         return isset($result['success']) && $result['success'];
+    }
+    private function validateUsername($username)
+    {
+        return !(User::find()->where(['username' => $username])->exists());
     }
 }

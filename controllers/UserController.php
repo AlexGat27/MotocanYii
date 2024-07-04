@@ -22,6 +22,21 @@ class UserController extends Controller
                 'application/json' => Response::FORMAT_JSON,
             ],
         ];
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::class,
+            'cors' => [                   // restrict access to domains:
+                'Origin' => [
+                    'http://localhost:8080', 'http://localhost:5173'
+
+                ],
+                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                'Access-Control-Allow-Credentials' => true,
+                'Access-Control-Request-Headers' => ['*'],
+                'Access-Control-Max-Age' => 3600 * 5,
+
+
+            ],
+        ];
 
         return $behaviors;
     }
@@ -71,9 +86,6 @@ class UserController extends Controller
 
     public function actionCheckAuth()
     {
-        $session = Yii::$app->session;
-        $sessionId = $session->getId();
-        Yii::info("Current session ID: $sessionId");
         if (Yii::$app->user->isGuest) {
             return ['status' => 'unauthorized'];
         }
