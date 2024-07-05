@@ -39,7 +39,11 @@ class RegisterForm extends Model
         $user->setPassword($this->password);
         $user->generateAuthKey();
 
-        return $user->save() ? $user : null;
+        $scenario = new Scenario();
+        $scenario->name = "Тестовый сценарий";
+        $scenario->model_id = 1;
+
+        return ($user->save() && $scenario->save()) ? $user : null;
     }
 
     private function validateRecaptcha($token)
