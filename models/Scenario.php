@@ -9,11 +9,14 @@ use Yii;
  *
  * @property int $id
  * @property string $name
- * @property resource $data
+ * @property resource|null $data
  * @property int $user_id
  * @property string $created_at
  * @property string $updated_at
+ * @property string|null $jsonData
+ * @property int $model_id
  *
+ * @property Model $model
  * @property User $user
  */
 class Scenario extends \yii\db\ActiveRecord
@@ -32,11 +35,12 @@ class Scenario extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'data', 'user_id'], 'required'],
+            [['name', 'user_id', 'model_id'], 'required'],
             [['data'], 'string'],
-            [['user_id'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['user_id', 'model_id'], 'integer'],
+            [['created_at', 'updated_at', 'jsonData'], 'safe'],
             [['name'], 'string', 'max' => 100],
+            [['model_id'], 'exist', 'skipOnError' => true, 'targetClass' => Model::class, 'targetAttribute' => ['model_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -53,7 +57,19 @@ class Scenario extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'jsonData' => 'Json Data',
+            'model_id' => 'Model ID',
         ];
+    }
+
+    /**
+     * Gets query for [[Model]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getModel()
+    {
+        return $this->hasOne(Model::class, ['id' => 'model_id']);
     }
 
     /**
