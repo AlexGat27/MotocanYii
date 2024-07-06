@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use Exception;
 use himiklab\yii2\recaptcha\ReCaptchaValidator3;
 use Yii;
 use yii\base\Model;
@@ -17,21 +18,21 @@ class RegisterForm extends Model
     {
         return [
             [['username', 'password'], 'required'],
-            ['username', 'validateUsername'],
             ['username', 'string', 'min' => 3, 'max' => 255],
             ['password', 'string', 'min' => 6],
+            ['username', 'validateUsername'],
         ];
     }
 
     public function register()
     {
         if (!$this->validate()) {
-            return null;
+            return $this->createErrorResponse($this->getErrors());
         }
 
         if (!$this->validateRecaptcha($this->reCaptcha)) {
             $this->addError('reCaptcha', 'Подтверждение reCAPTCHA не прошло.');
-            return null;
+            return $this->createErrorResponse($this->getErrors());
         }
 
         $user = new User();
@@ -39,11 +40,22 @@ class RegisterForm extends Model
         $user->setPassword($this->password);
         $user->generateAuthKey();
 
+        if (!$user->save()) {
+            $this->addErrors($user->getErrors());
+            return $this->createErrorResponse($this->getErrors());
+        }
+
         $scenario = new Scenario();
         $scenario->name = "Тестовый сценарий";
         $scenario->model_id = 1;
+        $scenario->user_id = $user->id;
 
-        return ($user->save() && $scenario->save()) ? $user : null;
+        if ($scenario->save()) {
+            return $this->createSuccessResponse($user);
+        } else {
+            $this->addErrors($scenario->getErrors());
+            return $this->createErrorResponse($this->getErrors());
+        }
     }
 
     private function validateRecaptcha($token)
@@ -53,8 +65,28 @@ class RegisterForm extends Model
         $result = json_decode($response, true);
         return isset($result['success']) && $result['success'];
     }
-    private function validateUsername($username)
+    public function validateUsername($attribute, $params)
     {
-        return !(User::find()->where(['username' => $username])->exists());
+        if (User::find()->where(['username' => $this->username])->exists()) {
+            $this->addError($attribute, 'Имя пользователя уже занято.');
+            return false;
+        }
+        return true;
+    }
+    private function createErrorResponse($errors)
+    {
+        Yii::$app->response->statusCode = 400;
+        return [
+            'status' => 'error',
+            'errors' => $errors,
+        ];
+    }
+
+    private function createSuccessResponse($user)
+    {
+        return [
+            'status' => 'success',
+            'user' => $user,
+        ];
     }
 }

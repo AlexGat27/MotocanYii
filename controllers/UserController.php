@@ -47,16 +47,7 @@ class UserController extends Controller
         $model->username = $request["username"];
         $model->password = $request["password"];
         $model->reCaptcha = $request["reCaptcha"];
-        if ($model->register()) {
-            return [
-                'success' => true,
-                'message' => 'Registration successful.',
-            ];
-        }
-        return [
-            'success' => true,
-            'errors' => $model->errors,
-        ];
+        return $model->register();
     }
 
     public function actionLogin()

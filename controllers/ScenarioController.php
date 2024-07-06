@@ -50,6 +50,9 @@ class ScenarioController extends Controller
             if (isset($scenario['model_attributes'])) {
                 $scenario['model_attributes'] = json_decode($scenario['model_attributes'], true);
             }
+            if (isset($scenario['jsonData'])) {
+                $scenario['jsonData'] = json_decode($scenario['jsonData'], true);
+            }
         }
         return $scenarios;
     }
@@ -67,9 +70,14 @@ class ScenarioController extends Controller
 
             if ($model->save()) {
                 // Добавляем model_name в массив данных, который будет возвращен как JSON
-                $scenarioData = $model->attributes;
-                $scenarioData['model_name'] = $modelName;
-
+                $scenarioData = [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'jsonData' => $model->jsonData,
+                    'model_name' => $modelName,
+                    'model_attributes' => $modelModel->attributes,
+                    'model_id' => $modelModel->id
+                ];
                 return $scenarioData;
             } else {
                 return $model->errors;
@@ -102,8 +110,9 @@ class ScenarioController extends Controller
 
         // Обновляем атрибуты сценария
 //        $scenario->name = $postData['name'] ? $postData['name'] : $scenario->name;
-        $scenario->jsonData = $postData['json_data'] ? $postData['json_data'] : $scenario->jsonData;
-        $scenario->data = $postData['data'] ? $postData['data'] : $scenario->data;
+        if ($postData['json_data']){
+            $scenario->jsonData = $postData['json_data'];
+        }
 
         if ($scenario->save()) {
             return $scenario;
