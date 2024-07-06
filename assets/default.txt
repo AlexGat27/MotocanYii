@@ -1,0 +1,89 @@
+/*-----БИБЛИОТЕКИ-----*/
+#include "buttoon.h"
+#include "kontur.h"
+/*-----БИБЛИОТЕКИ-----*/
+
+/*--------ВХОД-ВЫХОД--------*/
+const uint8_t numAnalogPins = 16;  // Общее количество аналоговых пинов
+const uint8_t numKonturPins = 8;   // Общее количество цифровых пинов (количество контуров)
+/*--------ВХОД-ВЫХОД--------*/
+
+Buttoon buttons[] = {
+  Buttoon(A0),
+  Buttoon(A1),
+  Buttoon(A2),
+  Buttoon(A3)
+};
+
+kontur konturs[] = {
+  kontur(3),
+  kontur(4),
+  kontur(5),
+  kontur(6),
+  kontur(9)
+};
+/*
+isPressed(numPresses, interval);  //isPressed(КОЛИЧЕСТВО НАЖАТИЙ, ВРЕМЯ ПРОВЕРКИ(ИНТЕРВАЛ))
+isHold(interval);                 //isHold(ВРЕМЯ УДЕРЖИВАНИЯ КНОПКИ)
+isHold(interval, state);          //по умолчанию state = 0(можно вызвать - isHold(ВРЕМЯ УДЕРЖИВАНИЯ КНОПКИ) )
+                                  //если state = 1, то функция возвращает 1 дважды, то есть удерживаем кнопку - получаем 1, отпустили кнопку - получаем 1
+
+turnON(power, delayTime = 0);                      //включить контур ( мощность, и время(по умолчанию 0) через которое включится контур)
+turnOFF(delayTime = 0);                            //выключить контур (время(по умолчанию 0) через которое выключится контур)
+blink(onTime, offTime, power);                     //мигание контуром ( включенное время, выключенное время, мощность) - мигает бесконечно
+blinkInPeriod(onTime, offTime, blinkTime, power);  //мигание контуром ( включенное время, выключенное время, время работы, мощность) - мигает в течение "время работы"
+toggle(power);                                     //включить/выключить контур; если включен, то выключаем, и наоборот
+cancel(void);                                      //выключить контур
+getOnOff(void);                                    //получить значение контура включен/выключен
+*/
+void setup() {
+  Serial.begin(9600);
+  pinMode(A6, INPUT);
+}
+#include "ConditionChecker.h"
+int countCon = 0;
+ConditionChecker con[countCon];  
+void loop() {
+
+  newUpdate();  
+}
+/*----- НАСТРОЙКА ФОТОРЕЗИСТОРА ДЕНЬ/НОЧЬ-----------*/
+bool pjoto;
+bool day_night(int16_t photoRes) {
+  if (analogRead(A6) < photoRes) {
+    pjoto = 0;
+  } else if (analogRead(A6) > (photoRes + 200)) {
+    pjoto = 1;
+  }
+  //return (analogRead(A6) < photoRes) ? 0 : 1;
+  return pjoto;
+}
+/*----- НАСТРОЙКА ФОТОРЕЗИСТОРА ДЕНЬ/НОЧЬ-----------*/
+void newUpdate() {
+  konturs[0].loop();
+  konturs[1].loop();
+  konturs[2].loop();
+  konturs[3].loop();
+  konturs[4].loop();
+  /*konturs[5].loop();
+  konturs[6].loop();
+  konturs[7].loop();*/
+  buttons[0].update();
+  buttons[1].update();
+  buttons[2].update();
+  buttons[3].update();
+  /*buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();
+  buttons[0].update();*/
+}
