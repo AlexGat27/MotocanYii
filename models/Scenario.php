@@ -81,4 +81,10 @@ class Scenario extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+//    public function afterFind()
+//    {
+//        parent::afterFind();
+//        $this->attributes = json_decode($this->attributes, true);
+//    }
 }

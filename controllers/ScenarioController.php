@@ -40,12 +40,21 @@ class ScenarioController extends Controller
     {
         $userId = Yii::$app->user->id;
         $scenarios = Scenario::find()
-            ->select(['scenario.*', 'model.name as model_name', 'model.id as model_id']) // Выбираем поля из таблицы scenario и связанной модели model
+            ->select(['scenario.id', 'scenario.name', 'scenario.jsonData', 'model.attributes as model_attributes',
+                'model.name as model_name', 'model.id as model_id']) // Выбираем поля из таблицы scenario и связанной модели model
             ->joinWith('model') // Объединяем с моделью model
             ->where(['scenario.user_id' => $userId]) // Условие по пользователю
             ->asArray() // Возвращаем результат в виде массива
             ->all(); // Получаем все записи
-        return $this->asJson($scenarios);
+        foreach ($scenarios as &$scenario) {
+            if (isset($scenario['model_attributes'])) {
+                $scenario['model_attributes'] = json_decode($scenario['model_attributes'], true);
+            }
+            if (isset($scenario['jsonData'])) {
+                $scenario['jsonData'] = json_decode($scenario['jsonData'], true);
+            }
+        }
+        return $scenarios;
     }
 
     public function actionCreate()
@@ -61,15 +70,20 @@ class ScenarioController extends Controller
 
             if ($model->save()) {
                 // Добавляем model_name в массив данных, который будет возвращен как JSON
-                $scenarioData = $model->attributes;
-                $scenarioData['model_name'] = $modelName;
-
-                return $this->asJson($scenarioData);
+                $scenarioData = [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'jsonData' => $model->jsonData,
+                    'model_name' => $modelName,
+                    'model_attributes' => $modelModel->attributes,
+                    'model_id' => $modelModel->id
+                ];
+                return $scenarioData;
             } else {
-                return $this->asJson($model->errors);
+                return $model->errors;
             }
         } else {
-            return $this->asJson(['error' => 'Модель не найдена по указанному имени']);
+            return ['error' => 'Модель не найдена по указанному имени'];
         }
     }
 
@@ -93,15 +107,31 @@ class ScenarioController extends Controller
 
         // Загружаем данные для обновления из запроса
         $postData = Yii::$app->request->getBodyParams();
+        $modelModel = Model::findOne(['name' => $postData['model_name']]);
 
-        // Обновляем атрибуты сценария
-        $scenario->jsonData = $postData['json_data'] ? $postData['json_data'] : $scenario->jsonData;
-        $scenario->data = $postData['data'] ? $postData['data'] : $scenario->data;
+        if (isset($postData['json_data'])){
+            $scenario->jsonData = $postData['json_data'];
+            $scenario->data = Yii::$app->arduinoConverter->processJsonData($postData['json_data']);
+        }
+        if (isset($postData['model_name'])){
+            $scenario->model_id = $modelModel->id;
+        }
+        if (isset($postData['name'])){
+            $scenario->name = $postData['name'];
+        }
 
         if ($scenario->save()) {
-            return $this->asJson($scenario);
+            $scenarioData = [
+                'id' => $scenario->id,
+                'name' => $scenario->name,
+                'jsonData' => $scenario->jsonData,
+                'model_name' => $modelModel->name,
+                'model_attributes' => $modelModel->attributes,
+                'model_id' => $modelModel->id
+            ];
+            return $scenarioData;
         } else {
-            return $this->asJson($scenario->errors);
+            return $scenario->errors;
         }
     }
 }

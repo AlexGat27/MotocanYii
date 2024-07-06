@@ -15,7 +15,6 @@ $config = [
     ],
     'components' => [
         'request' => [
-            //'cookieValidationKey' => Yii::$app->security->generateRandomString(),
             'enableCookieValidation' => false,
             'enableCsrfValidation' => false,
             'parsers' => [
@@ -81,6 +80,10 @@ $config = [
                 'sameSite' => \yii\web\Cookie::SAME_SITE_STRICT,
             ],
         ],
+        'arduinoConverter' => [
+            'class' => 'app\components\ArduinoConverterComponent',
+            'defaultFilePath' => '@app/assets/default.txt',
+        ],
     ],
 
 //    'as corsFilter' => [
@@ -95,13 +98,6 @@ $config = [
 //        ],
 //    ],
     'params' => $params,
-//    'on beforeSend' => function ($event) {
-//        $response = $event->sender;
-//        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:5173');
-//        $response->headers->set('Access-Control-Allow-Credentials', 'true');
-//        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-//        $response->headers->set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//    },
 ];
 
 if (YII_ENV_DEV) {
