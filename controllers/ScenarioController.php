@@ -107,20 +107,20 @@ class ScenarioController extends Controller
 
         // Загружаем данные для обновления из запроса
         $postData = Yii::$app->request->getBodyParams();
-        $modelModel = Model::findOne(['name' => $postData['model_name']]);
 
         if (isset($postData['json_data'])){
             $scenario->jsonData = $postData['json_data'];
             $scenario->data = Yii::$app->arduinoConverter->processJsonData($postData['json_data']);
         }
         if (isset($postData['model_name'])){
-            $scenario->model_id = $modelModel->id;
+            $scenario->model_id = Model::findOne(['name' => $postData['model_name']])->id;
         }
         if (isset($postData['name'])){
             $scenario->name = $postData['name'];
         }
 
         if ($scenario->save()) {
+            $modelModel = Model::findOne($scenario->model_id);
             $scenarioData = [
                 'id' => $scenario->id,
                 'name' => $scenario->name,
