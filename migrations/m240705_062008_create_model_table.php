@@ -19,6 +19,8 @@ class m240705_062008_create_model_table extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->notNull(),
         ]);
+        $this->createIndex('{{%idx-model-name}}', '{{%model}}', 'name', true); // Индекс на колонку "name" для ускорения поиска по имени
+        $this->createIndex('{{%idx-model-created_at}}', '{{%model}}', 'created_at'); // Индекс на колонку "created_at" для ускорения выборок по дате создания
     }
 
     /**
@@ -26,6 +28,8 @@ class m240705_062008_create_model_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropIndex('{{%idx-model-name}}', '{{%model}}');
+        $this->dropIndex('{{%idx-model-created_at}}', '{{%model}}');
         $this->dropTable('{{%model}}');
     }
 }

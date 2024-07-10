@@ -18,6 +18,8 @@ class m240630_144515_create_user_table extends Migration
             'password' => $this->string(255)->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
         ]);
+        $this->createIndex('{{%idx-user-username}}', '{{%user}}', 'username', true); // Индекс на колонку "username" для ускорения поиска по имени пользователя
+        $this->createIndex('{{%idx-user-created_at}}', '{{%user}}', 'created_at'); // Индекс на колонку "created_at" для ускорения выборок по дате создания
     }
 
     /**
@@ -25,6 +27,8 @@ class m240630_144515_create_user_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropIndex('{{%idx-user-username}}', '{{%user}}');
+        $this->dropIndex('{{%idx-user-created_at}}', '{{%user}}');
         $this->dropTable('{{%user}}');
     }
 }
