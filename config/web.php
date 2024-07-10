@@ -85,10 +85,7 @@ $config = [
             'defaultFilePath' => '@app/assets/default.txt',
         ],
     ],
-    'as corsFilter' => [
-        'class' => \yii\filters\Cors::class,
-        'only' => ['api/*'],
-    ],
+
 //    'as corsFilter' => [
 //        'class' => Cors::class,
 //        'cors' => [
