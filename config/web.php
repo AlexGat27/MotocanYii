@@ -56,9 +56,13 @@ $config = [
                 'POST api/v1/register' => 'user/register',
                 'POST api/v1/login' => 'user/login',
                 'GET api/v1/logout' => 'user/logout',
-                'GET api/v1/models' => 'model/index',
-                'GET api/v1/models/<id:\d+>' => 'model/view',
                 'GET api/v1/check-auth' => 'user/check-auth',
+                'GET api/v1/users' => 'user/index',
+                'DELETE api/v1/users/<id:\d+>' => 'user/delete',
+
+                'GET api/v1/models' => 'brand-model/index',
+                'GET api/v1/models/<id:\d+>' => 'brand-model/view',
+
                 'GET api/v1/scenarios' => 'scenario/index',
                 'POST api/v1/scenarios' => 'scenario/create',
                 'DELETE api/v1/scenarios/<id:\d+>' => 'scenario/delete',

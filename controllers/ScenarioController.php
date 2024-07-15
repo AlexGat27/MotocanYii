@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\Model;
+use app\models\BrandModel;
 use app\models\Scenario;
 use Yii;
 use yii\filters\AccessControl;
@@ -36,16 +36,21 @@ class ScenarioController extends Controller
 
         return $behaviors;
     }
+
+    /**
+     * Displays a list of scenarios for the current user.
+     * @return array
+     */
     public function actionIndex()
     {
         $userId = Yii::$app->user->id;
         $scenarios = Scenario::find()
-            ->select(['scenario.id', 'scenario.name', 'scenario.jsonData', 'model.attributes as model_attributes',
-                'model.name as model_name', 'model.id as model_id']) // Выбираем поля из таблицы scenario и связанной модели model
-            ->joinWith('model') // Объединяем с моделью model
+            ->select(['scenario.id', 'scenario.name', 'scenario.jsonData', 'brand_model.brand_id', 'brand_model.model_id', 'brand_model.data as model_attributes'])
+            ->joinWith('brandModel') // Объединяем с моделью brandModel
             ->where(['scenario.user_id' => $userId]) // Условие по пользователю
             ->asArray() // Возвращаем результат в виде массива
             ->all(); // Получаем все записи
+
         foreach ($scenarios as &$scenario) {
             if (isset($scenario['model_attributes'])) {
                 $scenario['model_attributes'] = json_decode($scenario['model_attributes'], true);
@@ -57,47 +62,63 @@ class ScenarioController extends Controller
         return $scenarios;
     }
 
+    /**
+     * Creates a new scenario.
+     * @return array
+     */
     public function actionCreate()
     {
         $model = new Scenario();
         $model->name = Yii::$app->request->post('name');
-        $modelName = Yii::$app->request->post('model_name');
-        $modelModel = Model::findOne(['name' => $modelName]);
+        $brandId = Yii::$app->request->post('brand_id');
+        $modelId = Yii::$app->request->post('model_id');
+        $brandModel = BrandModel::findOne(['brand_id' => $brandId, 'model_id' => $modelId]);
 
-        if ($modelModel !== null) {
-            $model->model_id = $modelModel->id;
+        if ($brandModel !== null) {
+            $model->model_id = $brandModel->id;
             $model->user_id = Yii::$app->user->id;
 
             if ($model->save()) {
-                // Добавляем model_name в массив данных, который будет возвращен как JSON
                 $scenarioData = [
                     'id' => $model->id,
                     'name' => $model->name,
-                    'jsonData' => $model->jsonData,
-                    'model_name' => $modelName,
-                    'model_attributes' => $modelModel->attributes,
-                    'model_id' => $modelModel->id
+                    'brand_id' => $brandId,
+                    'model_id' => $modelId,
+                    'model_attributes' => $brandModel->data
                 ];
                 return $scenarioData;
             } else {
-                return $model->errors;
+                return ['status' => 'error', 'errors' => $model->errors];
             }
         } else {
-            return ['error' => 'Модель не найдена по указанному имени'];
+            return ['status' => 'error', 'message' => 'BrandModel not found with the given brand_id and model_id'];
         }
     }
 
+    /**
+     * Deletes an existing scenario.
+     * @param int $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionDelete($id)
     {
         $userId = Yii::$app->user->id;
         $scenario = Scenario::findOne(['id' => $id, 'user_id' => $userId]);
+
         if ($scenario) {
             $scenario->delete();
             return ['status' => 'success'];
         }
-        return ['status' => 'error', 'message' => 'Scenario not found'];
+        throw new NotFoundHttpException('Scenario not found.');
     }
 
+    /**
+     * Updates an existing scenario.
+     * @param int $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionUpdate($id)
     {
         $scenario = Scenario::findOne($id);
@@ -105,33 +126,37 @@ class ScenarioController extends Controller
             throw new NotFoundHttpException('Scenario not found.');
         }
 
-        // Загружаем данные для обновления из запроса
         $postData = Yii::$app->request->getBodyParams();
 
-        if (isset($postData['json_data'])){
-            $scenario->jsonData = $postData['json_data'];
-            $scenario->data = Yii::$app->arduinoConverter->processJsonData($postData['json_data']);
+        if (isset($postData['jsonData'])) {
+            $scenario->jsonData = $postData['jsonData'];
+            $scenario->data = Yii::$app->arduinoConverter->processJsonData($postData['jsonData']);
         }
-        if (isset($postData['model_name'])){
-            $scenario->model_id = Model::findOne(['name' => $postData['model_name']])->id;
+        if (isset($postData['brand_id']) && isset($postData['model_id'])) {
+            $brandModel = BrandModel::findOne(['brand_id' => $postData['brand_id'], 'model_id' => $postData['model_id']]);
+            if ($brandModel) {
+                $scenario->brand_model_id = $brandModel->id;
+            } else {
+                return ['status' => 'error', 'message' => 'BrandModel not found with the given brand_id and model_id'];
+            }
         }
-        if (isset($postData['name'])){
+        if (isset($postData['name'])) {
             $scenario->name = $postData['name'];
         }
 
         if ($scenario->save()) {
-            $modelModel = Model::findOne($scenario->model_id);
+            $brandModel = BrandModel::findOne($scenario->brand_model_id);
             $scenarioData = [
                 'id' => $scenario->id,
                 'name' => $scenario->name,
-                'jsonData' => $scenario->jsonData,
-                'model_name' => $modelModel->name,
-                'model_attributes' => $modelModel->attributes,
-                'model_id' => $modelModel->id
+                'jsonData' => json_decode($scenario->jsonData, true),
+                'brand_id' => $brandModel->brand_id,
+                'model_id' => $brandModel->model_id,
+                'model_attributes' => json_decode($brandModel->data, true)
             ];
             return $scenarioData;
         } else {
-            return $scenario->errors;
+            return ['status' => 'error', 'errors' => $scenario->errors];
         }
     }
 }

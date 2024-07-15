@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "models".
+ * This is the model class for table "brands".
  *
  * @property int $id
  * @property string $name
@@ -14,14 +14,14 @@ use Yii;
  *
  * @property BrandModel[] $brandModels
  */
-class Model extends \yii\db\ActiveRecord
+class Brand extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'models';
+        return 'brands';
     }
 
     /**
@@ -56,6 +56,6 @@ class Model extends \yii\db\ActiveRecord
      */
     public function getBrandModels()
     {
-        return $this->hasMany(BrandModel::class, ['model_id' => 'id']);
+        return $this->hasMany(BrandModel::class, ['brand_id' => 'id']);
     }
 }

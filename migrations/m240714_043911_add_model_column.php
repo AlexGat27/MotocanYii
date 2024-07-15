@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m240705_064218_add_model_column
+ * Class m240714_043911_add_model_column
  */
-class m240705_064218_add_model_column extends Migration
+class m240714_043911_add_model_column extends Migration
 {
     /**
      * {@inheritdoc}
@@ -15,12 +15,19 @@ class m240705_064218_add_model_column extends Migration
         // Добавляем поле model_id
         $this->addColumn('{{%scenario}}', 'model_id', $this->integer()->notNull());
 
+        // Создаем индекс для model_id
+        $this->createIndex(
+            'idx-scenario-model_id',
+            '{{%scenario}}',
+            'model_id'
+        );
+
         // Создаем внешний ключ
         $this->addForeignKey(
             'fk-scenario-model_id',
             '{{%scenario}}',
             'model_id',
-            '{{%model}}',
+            '{{%brand_model}}',
             'id',
             'CASCADE'
         );
@@ -33,6 +40,9 @@ class m240705_064218_add_model_column extends Migration
     {
         // Удаляем внешний ключ
         $this->dropForeignKey('fk-scenario-model_id', '{{%scenario}}');
+
+        // Удаляем индекс
+        $this->dropIndex('idx-scenario-model_id', '{{%scenario}}');
 
         // Удаляем поле model_id
         $this->dropColumn('{{%scenario}}', 'model_id');

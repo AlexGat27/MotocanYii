@@ -16,7 +16,7 @@ use Yii;
  * @property string|null $jsonData
  * @property int $model_id
  *
- * @property Model $model
+ * @property BrandModel $model
  * @property User $user
  */
 class Scenario extends \yii\db\ActiveRecord
@@ -40,7 +40,7 @@ class Scenario extends \yii\db\ActiveRecord
             [['user_id', 'model_id'], 'integer'],
             [['created_at', 'updated_at', 'jsonData'], 'safe'],
             [['name'], 'string', 'max' => 100],
-            [['model_id'], 'exist', 'skipOnError' => true, 'targetClass' => Model::class, 'targetAttribute' => ['model_id' => 'id']],
+            [['model_id'], 'exist', 'skipOnError' => true, 'targetClass' => BrandModel::class, 'targetAttribute' => ['model_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -67,9 +67,9 @@ class Scenario extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getModel()
+    public function getbrandModel()
     {
-        return $this->hasOne(Model::class, ['id' => 'model_id']);
+        return $this->hasOne(BrandModel::class, ['id' => 'model_id']);
     }
 
     /**
@@ -81,10 +81,4 @@ class Scenario extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-
-//    public function afterFind()
-//    {
-//        parent::afterFind();
-//        $this->attributes = json_decode($this->attributes, true);
-//    }
 }

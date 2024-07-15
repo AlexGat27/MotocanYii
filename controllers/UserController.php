@@ -86,4 +86,48 @@ class UserController extends Controller
             'user' => Yii::$app->user->identity,
         ];
     }
+
+    /**
+     * Action для получения списка пользователей.
+     *
+     * @return array
+     */
+    public function actionIndex()
+    {
+        $users = User::find()->all();
+
+        return [
+            'success' => true,
+            'users' => $users,
+        ];
+    }
+
+    /**
+     * Action для удаления пользователя.
+     *
+     * @param int $id ID пользователя для удаления
+     * @return array
+     */
+    public function actionDelete($id)
+    {
+        $user = User::findOne($id);
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'Пользователь не найден.',
+            ];
+        }
+
+        if ($user->delete()) {
+            return [
+                'success' => true,
+                'message' => 'Пользователь успешно удален.',
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Ошибка при удалении пользователя.',
+            ];
+        }
+    }
 }
