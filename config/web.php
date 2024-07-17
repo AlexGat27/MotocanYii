@@ -24,6 +24,9 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
@@ -59,9 +62,17 @@ $config = [
                 'GET api/v1/check-auth' => 'user/check-auth',
                 'GET api/v1/users' => 'user/index',
                 'DELETE api/v1/users/<id:\d+>' => 'user/delete',
+                'PUT api/v1/users/assign-role/<id:\d+>' => 'user/assign-role',
 
-                'GET api/v1/models' => 'brand-model/index',
-                'GET api/v1/models/<id:\d+>' => 'brand-model/view',
+                'GET api/v1/models' => 'model/index',
+                'POST api/v1/models' => 'model/create',
+                'PUT api/v1/models/<id:\d+>' => 'model/update',
+                'DELETE api/v1/models/<id:\d+>' => 'model/delete',
+
+                'GET api/v1/brands' => 'brand/index',
+                'POST api/v1/brands' => 'brand/create',
+                'PUT api/v1/brands/<id:\d+>' => 'brand/update',
+                'DELETE api/v1/brands/<id:\d+>' => 'brand/delete',
 
                 'GET api/v1/scenarios' => 'scenario/index',
                 'POST api/v1/scenarios' => 'scenario/create',

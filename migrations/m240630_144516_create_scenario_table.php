@@ -40,11 +40,10 @@ class m240630_144516_create_scenario_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey('{{%fk-scenario-user_id}}', '{{%scenario}}');
         $this->dropIndex('{{%idx-scenario-name}}', '{{%scenario}}');
         $this->dropIndex('{{%idx-scenario-user_id}}', '{{%scenario}}');
         $this->dropIndex('{{%idx-scenario-created_at}}', '{{%scenario}}');
-
-        $this->dropForeignKey('{{%fk-scenario-user_id}}', '{{%scenario}}');
         $this->dropTable('{{%scenario}}');
     }
 }

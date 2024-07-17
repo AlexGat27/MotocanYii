@@ -12,7 +12,7 @@ use Yii;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
- * @property BrandModel[] $brandModels
+ * @property Models[] $models
  */
 class Brand extends \yii\db\ActiveRecord
 {
@@ -50,12 +50,12 @@ class Brand extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[BrandModels]].
+     * Gets query for [[Models]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBrandModels()
+    public function getModels()
     {
-        return $this->hasMany(BrandModel::class, ['brand_id' => 'id']);
+        return $this->hasMany(Models::class, ['brand_id' => 'id']);
     }
 }

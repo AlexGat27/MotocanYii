@@ -51,6 +51,8 @@ class RegisterForm extends Model
         $scenario->user_id = $user->id;
 
         if ($scenario->save()) {
+            $auth = Yii::$app->authManager;
+            $auth->assign($auth->getRole('user'), $user->id);
             return $this->createSuccessResponse($user);
         } else {
             $this->addErrors($scenario->getErrors());

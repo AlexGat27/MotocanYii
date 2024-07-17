@@ -8,11 +8,14 @@ use Yii;
  * This is the model class for table "models".
  *
  * @property int $id
+ * @property int $brand_id
  * @property string $name
+ * @property string $data
  * @property string|null $created_at
  * @property string|null $updated_at
  *
- * @property BrandModel[] $brandModels
+ * @property Brands $brand
+ * @property Scenario[] $scenarios
  */
 class Model extends \yii\db\ActiveRecord
 {
@@ -30,9 +33,11 @@ class Model extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['brand_id', 'name', 'data'], 'required'],
+            [['brand_id'], 'integer'],
+            [['data', 'created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
+            [['brand_id'], 'exist', 'skipOnError' => true, 'targetClass' => Brands::class, 'targetAttribute' => ['brand_id' => 'id']],
         ];
     }
 
@@ -43,19 +48,31 @@ class Model extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'brand_id' => 'Brand ID',
             'name' => 'Name',
+            'data' => 'Data',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
     }
 
     /**
-     * Gets query for [[BrandModels]].
+     * Gets query for [[Brand]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBrandModels()
+    public function getBrand()
     {
-        return $this->hasMany(BrandModel::class, ['model_id' => 'id']);
+        return $this->hasOne(Brands::class, ['id' => 'brand_id']);
+    }
+
+    /**
+     * Gets query for [[Scenarios]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getScenarios()
+    {
+        return $this->hasMany(Scenario::class, ['model_id' => 'id']);
     }
 }

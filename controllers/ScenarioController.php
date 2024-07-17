@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\BrandModel;
+use app\models\Model;
 use app\models\Scenario;
 use Yii;
 use yii\filters\AccessControl;
@@ -25,12 +26,19 @@ class ScenarioController extends Controller
         ];
         $behaviors['access'] = [
             'class' => AccessControl::class,
-            'only' => ['create', 'update', 'delete', 'index'], // Действия, для которых требуется аутентификация
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['@'], // '@' обозначает авторизованных пользователей
+                    'roles' => ['admin', 'user'], // '@' обозначает авторизованных пользователей
                 ],
+                [
+                    'allow' => false,
+                    'roles' => ['banned'],
+                    'denyCallback' => function ($rule, $action) {
+                        Yii::$app->response->statusCode = 403;
+                        return ['status' => 'error', 'message' => 'You are banned.'];
+                    },
+                ]
             ],
         ];
 
@@ -72,7 +80,7 @@ class ScenarioController extends Controller
         $model->name = Yii::$app->request->post('name');
         $brandId = Yii::$app->request->post('brand_id');
         $modelId = Yii::$app->request->post('model_id');
-        $brandModel = BrandModel::findOne(['brand_id' => $brandId, 'model_id' => $modelId]);
+        $brandModel = Model::findOne(['brand_id' => $brandId, 'id' => $modelId]);
 
         if ($brandModel !== null) {
             $model->model_id = $brandModel->id;
@@ -132,10 +140,10 @@ class ScenarioController extends Controller
             $scenario->jsonData = $postData['jsonData'];
             $scenario->data = Yii::$app->arduinoConverter->processJsonData($postData['jsonData']);
         }
-        if (isset($postData['brand_id']) && isset($postData['model_id'])) {
-            $brandModel = BrandModel::findOne(['brand_id' => $postData['brand_id'], 'model_id' => $postData['model_id']]);
+        if (isset($postData['model_id'])) {
+            $brandModel = Model::findOne($postData['model_id']);
             if ($brandModel) {
-                $scenario->brand_model_id = $brandModel->id;
+                $scenario->model_id = $brandModel->id;
             } else {
                 return ['status' => 'error', 'message' => 'BrandModel not found with the given brand_id and model_id'];
             }
@@ -145,13 +153,13 @@ class ScenarioController extends Controller
         }
 
         if ($scenario->save()) {
-            $brandModel = BrandModel::findOne($scenario->brand_model_id);
+            $brandModel = Model::findOne($scenario->model_id);
             $scenarioData = [
                 'id' => $scenario->id,
                 'name' => $scenario->name,
                 'jsonData' => json_decode($scenario->jsonData, true),
                 'brand_id' => $brandModel->brand_id,
-                'model_id' => $brandModel->model_id,
+                'model_id' => $brandModel->id,
                 'model_attributes' => json_decode($brandModel->data, true)
             ];
             return $scenarioData;

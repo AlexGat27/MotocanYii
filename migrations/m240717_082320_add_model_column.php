@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m240714_043911_add_model_column
+ * Class m240717_082320_add_model_column
  */
-class m240714_043911_add_model_column extends Migration
+class m240717_082320_add_model_column extends Migration
 {
     /**
      * {@inheritdoc}
@@ -27,7 +27,7 @@ class m240714_043911_add_model_column extends Migration
             'fk-scenario-model_id',
             '{{%scenario}}',
             'model_id',
-            '{{%brand_model}}',
+            '{{%models}}',
             'id',
             'CASCADE'
         );
@@ -57,7 +57,7 @@ class m240714_043911_add_model_column extends Migration
 
     public function down()
     {
-        echo "m240705_064218_add_model_column cannot be reverted.\n";
+        echo "m240717_082320_add_model_column cannot be reverted.\n";
 
         return false;
     }

@@ -3,16 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%model}}`.
+ * Handles the creation of table `{{%brands}}`.
  */
-class m240705_062008_create_model_table extends Migration
+class m240717_082256_create_brands_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%models}}', [
+        $this->createTable('{{%brands}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -25,6 +25,6 @@ class m240705_062008_create_model_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%models}}');
+        $this->dropTable('{{%brands}}');
     }
 }

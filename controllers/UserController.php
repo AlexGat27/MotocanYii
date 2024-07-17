@@ -6,6 +6,8 @@ use app\models\LoginForm;
 use app\models\RegisterForm;
 use app\models\User;
 use Yii;
+use yii\filters\AccessControl;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\Controller;
 
@@ -27,17 +29,36 @@ class UserController extends Controller
             'cors' => [                   // restrict access to domains:
                 'Origin' => [
                     'http://localhost:8080', 'http://localhost:5173'
-
                 ],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
                 'Access-Control-Allow-Credentials' => true,
                 'Access-Control-Request-Headers' => ['*'],
                 'Access-Control-Max-Age' => 3600 * 5,
-
-
             ],
         ];
-
+        $behaviors['access'] = [
+            'class' => AccessControl::class,
+            'except' => ['login', 'register', 'check-auth'],
+            'rules' => [
+                [
+                    'allow' => true,
+                    'actions' => ['logout'],
+                    'roles' => ['user'],
+                ],
+                [
+                    'allow' => false,
+                    'roles' => ['banned'],
+                    'denyCallback' => function ($rule, $action) {
+                        Yii::$app->response->statusCode = 403;
+                        return ['status' => 'error', 'message' => 'You are banned.'];
+                    },
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['admin'],
+                ],
+            ],
+        ];
         return $behaviors;
     }
     public function actionRegister()
@@ -110,7 +131,7 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $user = User::findOne($id);
+        $user = $this->findModel($id);
         if (!$user) {
             return [
                 'success' => false,
@@ -129,5 +150,36 @@ class UserController extends Controller
                 'message' => 'Ошибка при удалении пользователя.',
             ];
         }
+    }
+    public function actionAssignRole($id)
+    {
+        $request = Yii::$app->request->post();
+        $roleName = $request['roleName'];
+
+        $user = $this->findModel($id);
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole($roleName);
+
+        if (!$role) {
+            Yii::$app->response->statusCode = 404;
+            return ['status' => 'error', 'message' => 'Role not found.'];
+        }
+
+        if ($auth->assign($role, $user->id)) {
+            Yii::$app->response->statusCode = 200;
+            return ['status' => 'success', 'message' => 'Role assigned successfully.'];
+        } else {
+            Yii::$app->response->statusCode = 500;
+            return ['status' => 'error', 'message' => 'Failed to assign role.'];
+        }
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = User::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested user does not exist.');
     }
 }
