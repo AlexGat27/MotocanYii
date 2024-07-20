@@ -33,7 +33,7 @@ class BrandController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['admin'],
+                    'roles' => ['models'],
                 ]
             ]
         ];

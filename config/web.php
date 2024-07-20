@@ -60,8 +60,10 @@ $config = [
                 'POST api/v1/login' => 'user/login',
                 'GET api/v1/logout' => 'user/logout',
                 'GET api/v1/check-auth' => 'user/check-auth',
+                'GET api/v1/check-admin' => 'user/check-admin',
                 'GET api/v1/users' => 'user/index',
                 'DELETE api/v1/users/<id:\d+>' => 'user/delete',
+                'DELETE api/v1/users/block/<id:\d+>' => 'user/block',
                 'PUT api/v1/users/assign-role/<id:\d+>' => 'user/assign-role',
 
                 'GET api/v1/models' => 'model/index',

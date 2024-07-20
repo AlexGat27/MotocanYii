@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use app\models\Brand;
-use app\models\Model;
+use app\models\Brands;
+use app\models\Models;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -28,7 +28,7 @@ class ModelController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['admin'],
+                    'roles' => ['models'],
                 ],
                 [
                     'allow' => false,
@@ -48,7 +48,7 @@ class ModelController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $brandModels = Model::find()
+        $brandModels = Models::find()
             ->with(['brand'])
             ->asArray()
             ->all();
@@ -94,19 +94,19 @@ class ModelController extends Controller
     {
         $brandName = Yii::$app->request->post('brand_name');
         $modelName = Yii::$app->request->post('model_name');
-        $brand = Brand::findOne(['name' => $brandName]);
+        $brand = Brands::findOne(['name' => $brandName]);
 
         if(!$brand){
-            $brand = new Brand();
+            $brand = new Brands();
             $brand->name = $brandName;
         }
 
         if ($brand->save()) {
             // Загружаем имена бренда и модели
-            $model = Model::findOne(['name' => $modelName, 'brand_id' => $brand->id]);
+            $model = Models::findOne(['name' => $modelName, 'brand_id' => $brand->id]);
 
             if (!$model){
-                $model = new Model();
+                $model = new Models();
                 $model->name = $modelName;
                 $model->brand_id = $brand->id;
                 $model->data = json_encode(Yii::$app->request->post('data'));
@@ -135,7 +135,7 @@ class ModelController extends Controller
 
     public function actionUpdate($id)
     {
-        $model = Model::findOne($id);
+        $model = Models::findOne($id);
 
         if (!$model) {
             throw new NotFoundHttpException('The requested model does not exist.');
@@ -156,7 +156,7 @@ class ModelController extends Controller
             return [
                 'status' => 'success',
                 'brand_id' => $model->brand_id,
-                'brand_name' => Brand::findOne($model->brand_id)->name,
+                'brand_name' => Brands::findOne($model->brand_id)->name,
                 'model_id' => $id,
                 'model_name' => $model->name,
                 'data' => json_decode($model->data, true),
@@ -169,7 +169,7 @@ class ModelController extends Controller
 
     public function actionDelete($id)
     {
-        $brandModel = Model::findOne($id);
+        $brandModel = Models::findOne($id);
         if ($brandModel) {
             $brandModel->delete();
             return ['status' => 'success'];

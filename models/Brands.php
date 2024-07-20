@@ -14,7 +14,7 @@ use Yii;
  *
  * @property Models[] $models
  */
-class Brand extends \yii\db\ActiveRecord
+class Brands extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}

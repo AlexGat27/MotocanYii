@@ -29,7 +29,7 @@ class ScenarioController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['admin', 'user'], // '@' обозначает авторизованных пользователей
+                    'roles' => ['scenarios'],
                 ],
                 [
                     'allow' => false,
@@ -53,8 +53,8 @@ class ScenarioController extends Controller
     {
         $userId = Yii::$app->user->id;
         $scenarios = Scenario::find()
-            ->select(['scenario.id', 'scenario.name', 'scenario.jsonData', 'brand_model.brand_id', 'brand_model.model_id', 'brand_model.data as model_attributes'])
-            ->joinWith('brandModel') // Объединяем с моделью brandModel
+            ->select(['scenario.id', 'scenario.name', 'scenario.jsonData', 'models.brand_id', 'models.id as model_id', 'models.data as model_attributes'])
+            ->joinWith('model') // Объединяем с моделью brandModel
             ->where(['scenario.user_id' => $userId]) // Условие по пользователю
             ->asArray() // Возвращаем результат в виде массива
             ->all(); // Получаем все записи

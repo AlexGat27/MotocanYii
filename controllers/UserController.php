@@ -38,12 +38,12 @@ class UserController extends Controller
         ];
         $behaviors['access'] = [
             'class' => AccessControl::class,
-            'except' => ['login', 'register', 'check-auth'],
+            'except' => ['login', 'register', 'check-auth', 'check-admin'],
             'rules' => [
                 [
                     'allow' => true,
                     'actions' => ['logout'],
-                    'roles' => ['user'],
+                    'roles' => ['@'],
                 ],
                 [
                     'allow' => false,
@@ -55,7 +55,7 @@ class UserController extends Controller
                 ],
                 [
                     'allow' => true,
-                    'roles' => ['admin'],
+                    'roles' => ['users'],
                 ],
             ],
         ];
@@ -107,6 +107,18 @@ class UserController extends Controller
             'user' => Yii::$app->user->identity,
         ];
     }
+    public function actionCheckAdmin()
+    {
+        if (!Yii::$app->user->can('admin')) {
+            return [
+                'status' => 'permitted',
+            ];
+        }
+        return [
+            'status' => 'allow',
+            'user' => Yii::$app->user->identity,
+        ];
+    }
 
     /**
      * Action для получения списка пользователей.
@@ -115,11 +127,21 @@ class UserController extends Controller
      */
     public function actionIndex()
     {
-        $users = User::find()->all();
+        $users = User::find()->where(['!=', 'id', Yii::$app->user->id])->all();
+        $auth = Yii::$app->authManager;
+        $userList = [];
+
+        foreach ($users as $user) {
+            $roles = $auth->getRolesByUser($user->id);
+            $userList[] = [
+                ...$user,
+                'role' => array_keys($roles)[0], // Получаем список ролей пользователя
+            ];
+        }
 
         return [
             'success' => true,
-            'users' => $users,
+            'users' => $userList,
         ];
     }
 
@@ -138,8 +160,8 @@ class UserController extends Controller
                 'message' => 'Пользователь не найден.',
             ];
         }
-
-        if ($user->delete()) {
+        $auth = Yii::$app->authManager;
+        if ($user->delete() && $auth->revokeAll($user->id)) {
             return [
                 'success' => true,
                 'message' => 'Пользователь успешно удален.',
@@ -164,6 +186,9 @@ class UserController extends Controller
             Yii::$app->response->statusCode = 404;
             return ['status' => 'error', 'message' => 'Role not found.'];
         }
+        else{
+            $auth->revokeAll($user->id);
+        }
 
         if ($auth->assign($role, $user->id)) {
             Yii::$app->response->statusCode = 200;
@@ -171,6 +196,37 @@ class UserController extends Controller
         } else {
             Yii::$app->response->statusCode = 500;
             return ['status' => 'error', 'message' => 'Failed to assign role.'];
+        }
+    }
+    public function actionBlock($id)
+    {
+        $user = $this->findModel($id);
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'User not found.',
+            ];
+        }
+
+        $auth = Yii::$app->authManager;
+        $auth->revokeAll($user->id);
+        $bannedRole = $auth->getRole('banned');
+
+        if (!$bannedRole) {
+            Yii::$app->response->statusCode = 404;
+            return ['status' => 'error', 'message' => 'Role "banned" not found.'];
+        }
+
+        if ($auth->assign($bannedRole, $user->id)) {
+            return [
+                'success' => true,
+                'message' => 'User successfully banned.',
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Failed to ban user.',
+            ];
         }
     }
 

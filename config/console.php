@@ -31,13 +31,17 @@ $config = [
         ],
     ],
     'params' => $params,
-    /*
     'controllerMap' => [
-        'fixture' => [ // Fixture generation command line.
-            'class' => 'yii\faker\FixtureController',
+        'rbac' => [
+            'class' => 'app\commands\RbacController',
         ],
+        'root-user' =>[
+            'class' => 'app\commands\RootUserController',
+        ],
+        'root-model' => [
+            'class' => 'app\commands\RootModelController',
+        ]
     ],
-    */
 ];
 
 if (YII_ENV_DEV) {
