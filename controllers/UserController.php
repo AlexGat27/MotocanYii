@@ -101,22 +101,12 @@ class UserController extends Controller
         if (Yii::$app->user->isGuest) {
             return ['status' => 'unauthorized'];
         }
-
+        $auth = Yii::$app->authManager;
+        $rolesUser = $auth->getRolesByUser(Yii::$app->user->id);
         return [
             'status' => 'authorized',
             'user' => Yii::$app->user->identity,
-        ];
-    }
-    public function actionCheckAdmin()
-    {
-        if (!Yii::$app->user->can('admin')) {
-            return [
-                'status' => 'permitted',
-            ];
-        }
-        return [
-            'status' => 'allow',
-            'user' => Yii::$app->user->identity,
+            'roles' => array_keys($rolesUser),
         ];
     }
 
@@ -135,7 +125,7 @@ class UserController extends Controller
             $roles = $auth->getRolesByUser($user->id);
             $userList[] = [
                 ...$user,
-                'role' => array_keys($roles)[0], // Получаем список ролей пользователя
+                'roles' => array_keys($roles), // Получаем список ролей пользователя
             ];
         }
 
@@ -185,8 +175,7 @@ class UserController extends Controller
         if (!$role) {
             Yii::$app->response->statusCode = 404;
             return ['status' => 'error', 'message' => 'Role not found.'];
-        }
-        else{
+        } else {
             $auth->revokeAll($user->id);
         }
 
@@ -196,37 +185,6 @@ class UserController extends Controller
         } else {
             Yii::$app->response->statusCode = 500;
             return ['status' => 'error', 'message' => 'Failed to assign role.'];
-        }
-    }
-    public function actionBlock($id)
-    {
-        $user = $this->findModel($id);
-        if (!$user) {
-            return [
-                'success' => false,
-                'message' => 'User not found.',
-            ];
-        }
-
-        $auth = Yii::$app->authManager;
-        $auth->revokeAll($user->id);
-        $bannedRole = $auth->getRole('banned');
-
-        if (!$bannedRole) {
-            Yii::$app->response->statusCode = 404;
-            return ['status' => 'error', 'message' => 'Role "banned" not found.'];
-        }
-
-        if ($auth->assign($bannedRole, $user->id)) {
-            return [
-                'success' => true,
-                'message' => 'User successfully banned.',
-            ];
-        } else {
-            return [
-                'success' => false,
-                'message' => 'Failed to ban user.',
-            ];
         }
     }
 

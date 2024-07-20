@@ -2,8 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\BrandModel;
-use app\models\Model;
+use app\models\Models;
 use app\models\Scenario;
 use Yii;
 use yii\filters\AccessControl;
@@ -80,7 +79,7 @@ class ScenarioController extends Controller
         $model->name = Yii::$app->request->post('name');
         $brandId = Yii::$app->request->post('brand_id');
         $modelId = Yii::$app->request->post('model_id');
-        $brandModel = Model::findOne(['brand_id' => $brandId, 'id' => $modelId]);
+        $brandModel = Models::findOne(['brand_id' => $brandId, 'id' => $modelId]);
 
         if ($brandModel !== null) {
             $model->model_id = $brandModel->id;

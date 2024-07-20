@@ -57,7 +57,7 @@ class ModelController extends Controller
         foreach ($brandModels as $brandModel) {
             $data[] = [
                 'brand_id' => $brandModel['brand_id'],
-                'model_id' => $brandModel['model_id'],
+                'model_id' => $brandModel['id'],
                 'brand_name' => $brandModel['brand']['name'],
                 'model_name' => $brandModel['name'],
                 'attributes' => json_decode($brandModel['data'], true),

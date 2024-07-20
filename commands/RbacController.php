@@ -43,7 +43,7 @@ class RbacController extends Controller
         $auth->add($user);
         $auth->addChild($user, $scenariosPerm);
 
-        $banned = $auth->createPermission('banned');
+        $banned = $auth->createRole('banned');
         $auth->add($banned);
     }
 }
