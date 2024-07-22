@@ -2,8 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\Brands;
+use app\models\Models;
 use Yii;
-use app\models\Brand;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\rest\Controller;
@@ -48,7 +49,7 @@ class BrandController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Brand::find(),
+            'query' => Brands::find(),
         ]);
 
         return $dataProvider->getModels();
@@ -64,6 +65,13 @@ class BrandController extends Controller
     {
         return $this->findModel($id);
     }
+    public function actionIndexModels($id){
+        $models = Models::find()->where(['brand_id' => $id])->all();
+        foreach ($models as $model){
+            $model->data = json_decode($model->data);
+        }
+        return $models;
+    }
 
     /**
      * Creates a new Brand model.
@@ -72,7 +80,7 @@ class BrandController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Brand();
+        $model = new Brands();
 
         if ($model->load(Yii::$app->request->post(), '') && $model->save()) {
             Yii::$app->response->statusCode = 201;
@@ -137,12 +145,12 @@ class BrandController extends Controller
      * Finds the Brand model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Brand the loaded model
+     * @return Brands the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Brand::findOne($id)) !== null) {
+        if (($model = Brands::findOne($id)) !== null) {
             return $model;
         }
 

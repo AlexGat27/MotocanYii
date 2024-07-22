@@ -67,70 +67,46 @@ class ModelController extends Controller
         return $data;
     }
 
-    public function actionView($brand_id, $model_id)
+    public function actionView($id)
     {
-//        $brandModel = BrandModel::find()
-//            ->select(['brand_model.brand_id', 'brand_model.model_id', 'brand_model.data', 'brand.name as brand_name', 'model.name as model_name'])
-//            ->joinWith('brand')
-//            ->joinWith('model')
-//            ->where(['brand_model.brand_id' => $brand_id, 'brand_model.model_id' => $model_id])
-//            ->asArray()
-//            ->one();
-//
-//        if ($brandModel) {
-//            return [
-//                'brand_id' => $brandModel->brand_id,
-//                'model_id' => $brandModel->model_id,
-//                'brand_name' => $brandModel->brand_name,
-//                'model_name' => $brandModel->model_name,
-//                'data' => json_decode($brandModel->data, true),
-//            ];
-//        } else {
-//            throw new NotFoundHttpException('The requested brand-model combination does not exist.');
-//        }
+        $model = Models::findOne($id);
+        if ($model) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested model does not exist.');
+        }
     }
 
     public function actionCreate()
     {
-        $brandName = Yii::$app->request->post('brand_name');
-        $modelName = Yii::$app->request->post('model_name');
-        $brand = Brands::findOne(['name' => $brandName]);
-
-        if(!$brand){
-            $brand = new Brands();
-            $brand->name = $brandName;
+        $model = new Models();
+        if (Models::findOne(['name' => Yii::$app->request->post('name')])) {
+            Yii::$app->response->statusCode = 400;
+            return ['status' => 'error', 'message' => 'Model already exists.'];
         }
-
-        if ($brand->save()) {
-            // Загружаем имена бренда и модели
-            $model = Models::findOne(['name' => $modelName, 'brand_id' => $brand->id]);
-
-            if (!$model){
-                $model = new Models();
-                $model->name = $modelName;
-                $model->brand_id = $brand->id;
-                $model->data = json_encode(Yii::$app->request->post('data'));
-            }else{
-                return ['status' => 'error', 'message' => "Такая модель в БД уже есть"];
+        if ($model->load(Yii::$app->request->post(), '')) {
+            // Проверка валидности данных
+            if ($model->validate()) {
+                // Сохранение модели
+                if ($model->save()) {
+                    $model->data = json_decode($model->data);
+                    return ['status' => 'success', 'model' => $model];
+                } else {
+                    // Ошибка при сохранении модели
+                    Yii::$app->response->statusCode = 500;
+                    return ['status' => 'error', 'message' => 'Failed to save the model.'];
+                }
+            } else {
+                // Ошибка при валидации модели
+                Yii::$app->response->statusCode = 422;
+                return ['status' => 'error', 'message' => 'Validation failed.', 'errors' => $model->errors];
             }
-            if ($model->save()) {
-                return [
-                    'status' => 'success',
-                    'brand_id' => $model->brand_id,
-                    'brand_name' => $brand->name,
-                    'model_id' => $model->id,
-                    'model_name' => $model->name,
-                    'data' => json_decode($model->data, true),
-                ];
-            }
-            else{
-                return ['status' => 'error', 'errors' => $model->errors];
-            }
-
-
         } else {
-            return ['status' => 'error', 'errors' => $brand->errors];
+            // Ошибка при загрузке данных из POST-запроса
+            Yii::$app->response->statusCode = 400;
+            return ['status' => 'error', 'message' => 'Failed to load data.'];
         }
+
     }
 
     public function actionUpdate($id)

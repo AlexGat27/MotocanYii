@@ -117,7 +117,10 @@ class UserController extends Controller
      */
     public function actionIndex()
     {
-        $users = User::find()->where(['!=', 'id', Yii::$app->user->id])->all();
+        $users = User::find()
+            ->where(['!=', 'id', '1'])
+            ->andWhere(['!=', 'id', Yii::$app->user->identity->id])
+            ->all();
         $auth = Yii::$app->authManager;
         $userList = [];
 
