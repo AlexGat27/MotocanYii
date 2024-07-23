@@ -52,21 +52,22 @@ class ScenarioController extends Controller
     {
         $userId = Yii::$app->user->id;
         $scenarios = Scenario::find()
-            ->select(['scenario.id', 'scenario.name', 'scenario.jsonData', 'models.brand_id', 'models.id as model_id', 'models.data as model_attributes'])
-            ->joinWith('model') // Объединяем с моделью brandModel
-            ->where(['scenario.user_id' => $userId]) // Условие по пользователю
-            ->asArray() // Возвращаем результат в виде массива
+            ->with(['model']) // Объединяем с моделью brandModel
+            ->where(['scenario.user_id' => $userId])
+            ->asArray()
             ->all(); // Получаем все записи
-
-        foreach ($scenarios as &$scenario) {
-            if (isset($scenario['model_attributes'])) {
-                $scenario['model_attributes'] = json_decode($scenario['model_attributes'], true);
-            }
-            if (isset($scenario['jsonData'])) {
-                $scenario['jsonData'] = json_decode($scenario['jsonData'], true);
-            }
+        $data = [];
+        foreach ($scenarios as $scenario) {
+            $data[] = [
+                'id' => $scenario['id'],
+                'name' => $scenario['name'],
+                'jsonData' => $scenario['jsonData'] ? json_decode($scenario['jsonData']) : null,
+                'model_attributes' => json_decode($scenario['model']['data'], true),
+                'model_id' => $scenario['model_id'],
+                'user_id' => $userId,
+            ];
         }
-        return $scenarios;
+        return $data;
     }
 
     /**
@@ -140,7 +141,7 @@ class ScenarioController extends Controller
             $scenario->data = Yii::$app->arduinoConverter->processJsonData($postData['jsonData']);
         }
         if (isset($postData['model_id'])) {
-            $brandModel = Model::findOne($postData['model_id']);
+            $brandModel = Models::findOne($postData['model_id']);
             if ($brandModel) {
                 $scenario->model_id = $brandModel->id;
             } else {
@@ -152,14 +153,14 @@ class ScenarioController extends Controller
         }
 
         if ($scenario->save()) {
-            $brandModel = Model::findOne($scenario->model_id);
+            $brandModel = Models::findOne($scenario->model_id);
             $scenarioData = [
                 'id' => $scenario->id,
                 'name' => $scenario->name,
-                'jsonData' => json_decode($scenario->jsonData, true),
+                'jsonData' => $scenario->jsonData,
                 'brand_id' => $brandModel->brand_id,
                 'model_id' => $brandModel->id,
-                'model_attributes' => json_decode($brandModel->data, true)
+                'model_attributes' => $brandModel->data
             ];
             return $scenarioData;
         } else {

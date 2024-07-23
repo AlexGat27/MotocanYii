@@ -89,7 +89,6 @@ class ModelController extends Controller
             if ($model->validate()) {
                 // Сохранение модели
                 if ($model->save()) {
-                    $model->data = json_decode($model->data);
                     return ['status' => 'success', 'model' => $model];
                 } else {
                     // Ошибка при сохранении модели
