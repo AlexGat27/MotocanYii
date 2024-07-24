@@ -102,10 +102,13 @@ class UserController extends Controller
             return ['status' => 'unauthorized'];
         }
         $auth = Yii::$app->authManager;
+        $user = Yii::$app->user->identity;
         $rolesUser = $auth->getRolesByUser(Yii::$app->user->id);
         return [
             'status' => 'authorized',
-            'user' => Yii::$app->user->identity,
+            'id' => $user->id,
+            'username' => $user->username,
+            'created_at' => $user->created_at,
             'roles' => array_keys($rolesUser),
         ];
     }
@@ -126,10 +129,7 @@ class UserController extends Controller
 
         foreach ($users as $user) {
             $roles = $auth->getRolesByUser($user->id);
-            $userList[] = [
-                ...$user,
-                'roles' => array_keys($roles), // Получаем список ролей пользователя
-            ];
+            $userList[] = $this->generateSuccessResponse($user, $roles);
         }
 
         return [
@@ -177,17 +177,17 @@ class UserController extends Controller
 
         if (!$role) {
             Yii::$app->response->statusCode = 404;
-            return ['status' => 'error', 'message' => 'Role not found.'];
+            return $this->generateErrorResponse('Role not found.');
         } else {
             $auth->revokeAll($user->id);
         }
 
         if ($auth->assign($role, $user->id)) {
             Yii::$app->response->statusCode = 200;
-            return ['status' => 'success', 'message' => 'Role assigned successfully.'];
+            return ['status' => 'success', 'message'=>'Role assigned successfully.'];
         } else {
             Yii::$app->response->statusCode = 500;
-            return ['status' => 'error', 'message' => 'Failed to assign role.'];
+            return $this->generateErrorResponse('Failed to assign role.');
         }
     }
 
@@ -198,5 +198,17 @@ class UserController extends Controller
         }
 
         throw new NotFoundHttpException('The requested user does not exist.');
+    }
+    private function generateSuccessResponse($user, $roles)
+    {
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'created_at' => $user->created_at,
+            'roles' => array_keys($roles),
+        ];
+    }
+    private function generateErrorResponse($message){
+        return ['status' => 'error', 'message' => $message];
     }
 }

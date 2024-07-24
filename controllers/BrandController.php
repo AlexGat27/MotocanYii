@@ -68,7 +68,7 @@ class BrandController extends Controller
     public function actionIndexModels($id){
         $models = Models::find()->where(['brand_id' => $id])->all();
         foreach ($models as $model){
-            $model->data = json_decode($model->data);
+            $model->data = is_string($model->data) ? json_decode($model->data) : $model->data;
         }
         return $models;
     }

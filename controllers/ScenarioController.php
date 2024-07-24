@@ -58,14 +58,7 @@ class ScenarioController extends Controller
             ->all(); // Получаем все записи
         $data = [];
         foreach ($scenarios as $scenario) {
-            $data[] = [
-                'id' => $scenario['id'],
-                'name' => $scenario['name'],
-                'jsonData' => $scenario['jsonData'] ? json_decode($scenario['jsonData']) : null,
-                'model_attributes' => json_decode($scenario['model']['data'], true),
-                'model_id' => $scenario['model_id'],
-                'user_id' => $userId,
-            ];
+            $data[] = $this->generateSuccessResponse($scenario, $scenario['model']);
         }
         return $data;
     }
@@ -87,19 +80,12 @@ class ScenarioController extends Controller
             $model->user_id = Yii::$app->user->id;
 
             if ($model->save()) {
-                $scenarioData = [
-                    'id' => $model->id,
-                    'name' => $model->name,
-                    'brand_id' => $brandId,
-                    'model_id' => $modelId,
-                    'model_attributes' => $brandModel->data
-                ];
-                return $scenarioData;
+                return $this->generateSuccessResponse($model, $brandModel);
             } else {
                 return ['status' => 'error', 'errors' => $model->errors];
             }
         } else {
-            return ['status' => 'error', 'message' => 'BrandModel not found with the given brand_id and model_id'];
+            return $this->generateErrorResponse('BrandModel not found with the given model_id');
         }
     }
 
@@ -145,7 +131,7 @@ class ScenarioController extends Controller
             if ($brandModel) {
                 $scenario->model_id = $brandModel->id;
             } else {
-                return ['status' => 'error', 'message' => 'BrandModel not found with the given brand_id and model_id'];
+                return $this->generateErrorResponse('BrandModel not found with the given model_id');
             }
         }
         if (isset($postData['name'])) {
@@ -154,17 +140,23 @@ class ScenarioController extends Controller
 
         if ($scenario->save()) {
             $brandModel = Models::findOne($scenario->model_id);
-            $scenarioData = [
-                'id' => $scenario->id,
-                'name' => $scenario->name,
-                'jsonData' => $scenario->jsonData,
-                'brand_id' => $brandModel->brand_id,
-                'model_id' => $brandModel->id,
-                'model_attributes' => $brandModel->data
-            ];
-            return $scenarioData;
+            return $this->generateSuccessResponse($scenario, $brandModel);
         } else {
             return ['status' => 'error', 'errors' => $scenario->errors];
         }
+    }
+    private function generateSuccessResponse($model, $brandModel)
+    {
+        return [
+            'id' => $model['id'],
+            'name' => $model['name'],
+            'jsonData' => is_string($model['jsonData']) ? json_decode($model['jsonData']) : $model['jsonData'],
+            'user_id' => $model['user_id'],
+            'model_id' => $model['model_id'],
+            'model_attributes' => is_string($brandModel['data']) ? json_decode($brandModel['data']) : $brandModel['data']
+        ];
+    }
+    private function generateErrorResponse($message){
+        return ['status' => 'error', 'message' => $message];
     }
 }
