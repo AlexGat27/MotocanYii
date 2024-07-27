@@ -15,7 +15,8 @@ class m240630_144516_create_scenario_table extends Migration
         $this->createTable('{{%scenario}}', [
             'id' => $this->primaryKey()->notNull(),
             'name' => $this->string(100)->notNull(),
-            'data' => $this->binary()->notNull(),
+            'data' => $this->binary()->null(),
+            'jsonData' => $this->json(),
             'user_id' => $this->integer()->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->notNull(),

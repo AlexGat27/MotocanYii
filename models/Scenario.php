@@ -10,10 +10,10 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property resource|null $data
+ * @property string|null $jsonData
  * @property int $user_id
  * @property string $created_at
  * @property string $updated_at
- * @property string|null $jsonData
  * @property int $model_id
  *
  * @property Models $model
@@ -37,8 +37,8 @@ class Scenario extends \yii\db\ActiveRecord
         return [
             [['name', 'user_id', 'model_id'], 'required'],
             [['data'], 'string'],
+            [['jsonData', 'created_at', 'updated_at'], 'safe'],
             [['user_id', 'model_id'], 'integer'],
-            [['created_at', 'updated_at', 'jsonData'], 'safe'],
             [['name'], 'string', 'max' => 100],
             [['model_id'], 'exist', 'skipOnError' => true, 'targetClass' => Models::class, 'targetAttribute' => ['model_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -54,10 +54,10 @@ class Scenario extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'data' => 'Data',
+            'jsonData' => 'Json Data',
             'user_id' => 'User ID',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
-            'jsonData' => 'Json Data',
             'model_id' => 'Model ID',
         ];
     }
@@ -80,5 +80,9 @@ class Scenario extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+    public function getCanComand()
+    {
+        return $this->hasMany(CanComands::class, ['model_id' => 'model_id']);
     }
 }

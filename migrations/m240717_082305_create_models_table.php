@@ -16,7 +16,6 @@ class m240717_082305_create_models_table extends Migration
             'id' => $this->primaryKey(),
             'brand_id' => $this->integer()->notNull(),
             'name' => $this->string()->notNull(),
-            'data' => $this->json()->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);

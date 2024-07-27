@@ -61,7 +61,6 @@ class ModelController extends Controller
                 'model_id' => $brandModel['id'],
                 'brand_name' => $brandModel['brand']['name'],
                 'model_name' => $brandModel['name'],
-                'attributes' => is_string($brandModel['data']) ? json_decode($brandModel['data']) : $brandModel['data']
             ];
         }
 

@@ -10,11 +10,11 @@ use Yii;
  * @property int $id
  * @property int $brand_id
  * @property string $name
- * @property string $data
  * @property string|null $created_at
  * @property string|null $updated_at
  *
  * @property Brands $brand
+ * @property CanComands[] $canComands
  * @property Scenario[] $scenarios
  */
 class Models extends \yii\db\ActiveRecord
@@ -33,9 +33,9 @@ class Models extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['brand_id', 'name', 'data'], 'required'],
+            [['brand_id', 'name'], 'required'],
             [['brand_id'], 'integer'],
-            [['data', 'created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['brand_id'], 'exist', 'skipOnError' => true, 'targetClass' => Brands::class, 'targetAttribute' => ['brand_id' => 'id']],
         ];
@@ -50,7 +50,6 @@ class Models extends \yii\db\ActiveRecord
             'id' => 'ID',
             'brand_id' => 'Brand ID',
             'name' => 'Name',
-            'data' => 'Data',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -64,6 +63,16 @@ class Models extends \yii\db\ActiveRecord
     public function getBrand()
     {
         return $this->hasOne(Brands::class, ['id' => 'brand_id']);
+    }
+
+    /**
+     * Gets query for [[CanComands]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCanComands()
+    {
+        return $this->hasMany(CanComands::class, ['model_id' => 'id']);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\CanComands;
 use app\models\Models;
 use app\models\Scenario;
 use Yii;
@@ -52,7 +53,7 @@ class ScenarioController extends Controller
     {
         $userId = Yii::$app->user->id;
         $scenarios = Scenario::find()
-            ->with(['model']) // Объединяем с моделью brandModel
+            ->with(['model'])
             ->where(['scenario.user_id' => $userId])
             ->asArray()
             ->all(); // Получаем все записи
@@ -147,13 +148,22 @@ class ScenarioController extends Controller
     }
     private function generateSuccessResponse($model, $brandModel)
     {
+        $canComandNames = CanComands::find()
+            ->select('name')
+            ->where(['model_id' => $brandModel['id']])
+            ->asArray()
+            ->all();
         return [
             'id' => $model['id'],
             'name' => $model['name'],
             'jsonData' => is_string($model['jsonData']) ? json_decode($model['jsonData']) : $model['jsonData'],
             'user_id' => $model['user_id'],
-            'model_id' => $model['model_id'],
-            'model_attributes' => is_string($brandModel['data']) ? json_decode($brandModel['data']) : $brandModel['data']
+            'model' => [
+                'id' => $brandModel['id'],
+                'name' => $brandModel['name'],
+                'canCommands' => $canComandNames,
+            ]
+
         ];
     }
     private function generateErrorResponse($message){
