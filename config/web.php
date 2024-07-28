@@ -71,12 +71,17 @@ $config = [
                 'POST api/v1/models' => 'model/create',
                 'PUT api/v1/models/<id:\d+>' => 'model/update',
                 'DELETE api/v1/models/<id:\d+>' => 'model/delete',
+                'GET api/v1/models/<id:\d+>/canCommands' => 'model/index-can-commands',
 
                 'GET api/v1/brands' => 'brand/index',
                 'POST api/v1/brands' => 'brand/create',
                 'PUT api/v1/brands/<id:\d+>' => 'brand/update',
                 'DELETE api/v1/brands/<id:\d+>' => 'brand/delete',
                 'GET api/v1/brands/<id:\d+>/models' => 'brand/index-models',
+
+                'POST api/v1/canCommands/' => 'can-command/create',
+                'DELETE api/v1/canCommands/<id:\d+>' => 'can-command/delete',
+                'PUT api/v1/canCommands/<id:\d+>' => 'can-command/update',
 
                 'GET api/v1/scenarios' => 'scenario/index',
                 'POST api/v1/scenarios' => 'scenario/create',

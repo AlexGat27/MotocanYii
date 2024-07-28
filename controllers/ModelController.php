@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Brands;
+use app\models\CanCommands;
 use app\models\Models;
 use PhpParser\Node\Scalar\String_;
 use Yii;
@@ -65,6 +66,9 @@ class ModelController extends Controller
         }
 
         return $data;
+    }
+    public function actionIndexCanCommands($id){
+        return CanCommands::findAll(['model_id' => $id]);
     }
 
     public function actionView($id)
@@ -155,7 +159,6 @@ class ModelController extends Controller
             'id' => $model->id,
             'brand_id' => $model->brand_id,
             'name' => $model->name,
-            'data' => is_string($model->data) ? json_decode($model->data) : $model->data
         ]];
     }
     private function generateErrorResponse($message){

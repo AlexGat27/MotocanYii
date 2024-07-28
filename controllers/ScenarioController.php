@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\CanComands;
+use app\models\CanCommands;
 use app\models\Models;
 use app\models\Scenario;
 use Yii;
@@ -148,11 +149,10 @@ class ScenarioController extends Controller
     }
     private function generateSuccessResponse($model, $brandModel)
     {
-        $canComandNames = CanComands::find()
+        $canComandNames = CanCommands::find()
             ->select('name')
             ->where(['model_id' => $brandModel['id']])
-            ->asArray()
-            ->all();
+            ->column();
         return [
             'id' => $model['id'],
             'name' => $model['name'],

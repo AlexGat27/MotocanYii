@@ -81,8 +81,4 @@ class Scenario extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-    public function getCanComand()
-    {
-        return $this->hasMany(CanComands::class, ['model_id' => 'model_id']);
-    }
 }
