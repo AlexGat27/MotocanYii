@@ -24,15 +24,6 @@ class m240717_082305_create_models_table extends Migration
             '{{%models}}',
             'brand_id'
         );
-
-        $this->execute("
-            CREATE TRIGGER update_models_updated_at
-            AFTER UPDATE ON {{%models}}
-            FOR EACH ROW
-            BEGIN
-                UPDATE {{%models}} SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
-            END
-        ");
     }
 
     /**
