@@ -25,16 +25,6 @@ class m240717_082305_create_models_table extends Migration
             'brand_id'
         );
 
-        // Добавление внешнего ключа для таблицы `brands`
-        $this->addForeignKey(
-            '{{%fk-models-brand_id}}',
-            '{{%models}}',
-            'brand_id',
-            '{{%brands}}',
-            'id',
-            'CASCADE'
-        );
-
         $this->execute("
             CREATE TRIGGER update_models_updated_at
             AFTER UPDATE ON {{%models}}
@@ -50,10 +40,6 @@ class m240717_082305_create_models_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey(
-            '{{%fk-models-brand_id}}',
-            '{{%models}}'
-        );
 
         // Удаление индекса
         $this->dropIndex(

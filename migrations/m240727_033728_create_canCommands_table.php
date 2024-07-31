@@ -26,7 +26,6 @@ class m240727_033728_create_canCommands_table extends Migration
             'byte_7' => $this->integer()->notNull()->unsigned(),
             'byte_8' => $this->integer()->notNull()->unsigned(),
         ]);
-        $this->addForeignKey('fk-canCommands-model_id', 'canCommands', 'model_id', 'models', 'id', 'CASCADE');
         $this->createIndex('idx-canCommands-command_id', 'canCommands', 'command_id');
         $this->createIndex('idx-canCommands-model_id', 'canCommands', 'model_id');
     }
@@ -37,7 +36,6 @@ class m240727_033728_create_canCommands_table extends Migration
     public function safeDown()
     {
 
-        $this->dropForeignKey('fk-canCommands-model_id', 'canCommands');
         $this->dropIndex('idx-canCommands-model_id', 'canCommands');
         $this->dropIndex('idx-canCommands-command_id', 'canCommands');
         $this->dropTable('{{%canCommands}}');

@@ -25,16 +25,6 @@ class m240630_144516_create_scenario_table extends Migration
         $this->createIndex('{{%idx-scenario-user_id}}', '{{%scenario}}', 'user_id'); // Индекс на колонку "user_id" для ускорения поиска по ID пользователя
         $this->createIndex('{{%idx-scenario-created_at}}', '{{%scenario}}', 'created_at'); // Индекс на колонку "created_at" для ускорения выборок по дате создания
 
-
-        $this->addForeignKey(
-            '{{%fk-scenario-user_id}}', // это имя внешнего ключа
-            '{{%scenario}}', // таблица, к которой применяется внешний ключ
-            'user_id', // столбец в этой таблице
-            '{{%user}}', // таблица, на которую ссылается внешний ключ
-            'id', // столбец в этой таблице, на который ссылается внешний ключ
-            'CASCADE' // действие при удалении строки,
-        );
-
         $this->execute("
             CREATE TRIGGER update_scenario_updated_at
             AFTER UPDATE ON {{%scenario}}
@@ -50,7 +40,6 @@ class m240630_144516_create_scenario_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('{{%fk-scenario-user_id}}', '{{%scenario}}');
         $this->dropIndex('{{%idx-scenario-name}}', '{{%scenario}}');
         $this->dropIndex('{{%idx-scenario-user_id}}', '{{%scenario}}');
         $this->dropIndex('{{%idx-scenario-created_at}}', '{{%scenario}}');

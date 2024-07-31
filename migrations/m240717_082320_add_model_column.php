@@ -21,16 +21,6 @@ class m240717_082320_add_model_column extends Migration
             '{{%scenario}}',
             'model_id'
         );
-
-        // Создаем внешний ключ
-        $this->addForeignKey(
-            'fk-scenario-model_id',
-            '{{%scenario}}',
-            'model_id',
-            '{{%models}}',
-            'id',
-            'CASCADE'
-        );
     }
 
     /**
@@ -39,7 +29,6 @@ class m240717_082320_add_model_column extends Migration
     public function safeDown()
     {
         // Удаляем внешний ключ
-        $this->dropForeignKey('fk-scenario-model_id', '{{%scenario}}');
 
         // Удаляем индекс
         $this->dropIndex('idx-scenario-model_id', '{{%scenario}}');
