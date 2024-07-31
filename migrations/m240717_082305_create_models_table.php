@@ -17,7 +17,7 @@ class m240717_082305_create_models_table extends Migration
             'brand_id' => $this->integer()->notNull(),
             'name' => $this->string()->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
         ]);
         $this->createIndex(
             '{{%idx-models-brand_id}}',
@@ -34,6 +34,15 @@ class m240717_082305_create_models_table extends Migration
             'id',
             'CASCADE'
         );
+
+        $this->execute("
+            CREATE TRIGGER update_models_updated_at
+            AFTER UPDATE ON {{%models}}
+            FOR EACH ROW
+            BEGIN
+                UPDATE {{%models}} SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
+            END
+        ");
     }
 
     /**

@@ -19,7 +19,7 @@ class m240630_144516_create_scenario_table extends Migration
             'jsonData' => $this->json(),
             'user_id' => $this->integer()->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
-            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->notNull(),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
         ]);
         $this->createIndex('{{%idx-scenario-name}}', '{{%scenario}}', 'name'); // Индекс на колонку "name" для ускорения поиска по имени сценария
         $this->createIndex('{{%idx-scenario-user_id}}', '{{%scenario}}', 'user_id'); // Индекс на колонку "user_id" для ускорения поиска по ID пользователя
@@ -34,6 +34,15 @@ class m240630_144516_create_scenario_table extends Migration
             'id', // столбец в этой таблице, на который ссылается внешний ключ
             'CASCADE' // действие при удалении строки,
         );
+
+        $this->execute("
+            CREATE TRIGGER update_scenario_updated_at
+            AFTER UPDATE ON {{%scenario}}
+            FOR EACH ROW
+            BEGIN
+                UPDATE {{%scenario}} SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
+            END
+        ");
     }
 
     /**

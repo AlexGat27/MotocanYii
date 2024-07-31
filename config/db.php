@@ -2,8 +2,6 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=motocan',
-    'username' => 'root',
-    'password' => '',
+    'dsn' => 'sqlite:@app/assets/motocan.db',
     'charset' => 'utf8',
 ];
