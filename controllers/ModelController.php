@@ -144,6 +144,10 @@ class ModelController extends Controller
 
     public function actionDelete($id)
     {
+        if ($id == 1){
+            Yii::$app->response->statusCode = 400;
+            return ['status' => 'error', 'message' => 'You can not delete root model'];
+        }
         $brandModel = Models::findOne($id);
         if ($brandModel) {
             $brandModel->delete();

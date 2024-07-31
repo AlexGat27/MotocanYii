@@ -87,6 +87,7 @@ $config = [
                 'POST api/v1/scenarios' => 'scenario/create',
                 'DELETE api/v1/scenarios/<id:\d+>' => 'scenario/delete',
                 'PUT api/v1/scenarios/<id:\d+>' => 'scenario/update',
+                'GET api/v1/scenarios/<id:\d+>/download' => 'scenario/download'
             ],
         ],
         'reCaptcha' => [

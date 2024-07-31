@@ -34,9 +34,9 @@ class ArduinoConverterComponent extends Component
             foreach ($contour['containers'] as $container) {
                 $this->_createConditionStringRecord($container, $updatedLoopContent, $conIndex);
                 $updatedLoopContent .= "   if (con[$conIndex].getKontState() == KONT_ON){\n";
-                $this->_createActionStringRecord($container, $contour['contourID'], $updatedLoopContent);
+                $this->_createActionStringRecord($container, $conIndex, $updatedLoopContent);
                 $updatedLoopContent .= "   }else if (con[$conIndex].getKontState() == KONT_OFF) {
-      kontours[" . $contour['contourID'] . "].turnOFF();\n   }\n\n";
+      kontours[" . $conIndex . "].turnOFF();\n   }\n\n";
                 $conIndex++;
             }
         }
@@ -105,6 +105,7 @@ class ArduinoConverterComponent extends Component
             switch ($act['action']) {
                 case "Включить":
                     $updatedLoopContent .= "      kontours[$contourID].turnON(" . $act['power'] . ");\n";
+                    $updatedLoopContent .= "      kontours[$contourID].turnOFF(" . $act['workingPeriod'] . ");\n";
                     break;
                 case "Мигать":
                     if ($act['workingPeriod'] === "Постоянно" || $act['workingPeriod'] === '') {

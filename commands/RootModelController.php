@@ -14,10 +14,12 @@ class RootModelController extends Controller
         $modelName = "Тестовая модель";
 
         $brand = new Brands();
+        $brand->id = 1;
         $brand->name = $brandName;
 
         if ($brand->save()) {
             $model = new Models();
+            $model->id = 1;
             $model->name = $modelName;
             $model->brand_id = $brand->id;
             if ($model->save()) {

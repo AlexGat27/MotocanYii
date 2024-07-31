@@ -101,11 +101,9 @@ class BrandController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if ($model->load(Yii::$app->request->post(), '') && $model->save()) {
             return $model;
         }
-
         Yii::$app->response->statusCode = 400;
         return [
             'status' => 'error',
@@ -122,6 +120,10 @@ class BrandController extends Controller
      */
     public function actionDelete($id)
     {
+        if ($id == 1){
+            Yii::$app->response->statusCode = 400;
+            return ['status' => 'error', 'message' => 'You can not delete root model'];
+        }
         $model = $this->findModel($id);
 
         if ($model->delete()) {

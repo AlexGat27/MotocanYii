@@ -147,6 +147,17 @@ class ScenarioController extends Controller
             return ['status' => 'error', 'errors' => $scenario->errors];
         }
     }
+    public function actionDownload($id)
+    {
+        $scenario = Scenario::findOne($id);
+        if (!$scenario) {
+            throw new NotFoundHttpException('Scenario not found.');
+        }
+        if (!$scenario->data) {
+            return $this->generateErrorResponse('Scenario data not saving.');
+        }
+        return ['status' => 'success', 'hexData' => $scenario->data];
+    }
     private function generateSuccessResponse($model, $brandModel)
     {
         $canComandNames = CanCommands::find()
