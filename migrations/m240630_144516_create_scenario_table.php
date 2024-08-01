@@ -16,7 +16,7 @@ class m240630_144516_create_scenario_table extends Migration
             'id' => $this->primaryKey()->notNull(),
             'name' => $this->string(100)->notNull(),
             'data' => $this->binary()->null(),
-            'jsonData' => $this->json(),
+            'jsonData' => $this->text(), // SQLite не поддерживает тип json, используем text
             'user_id' => $this->integer()->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
