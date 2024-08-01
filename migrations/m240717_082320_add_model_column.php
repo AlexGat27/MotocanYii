@@ -13,7 +13,7 @@ class m240717_082320_add_model_column extends Migration
     public function safeUp()
     {
         // Добавляем поле model_id
-        $this->addColumn('{{%scenario}}', 'model_id', $this->integer()->notNull());
+        $this->addColumn('{{%scenario}}', 'model_id', $this->integer());
 
         // Создаем индекс для model_id
         $this->createIndex(
