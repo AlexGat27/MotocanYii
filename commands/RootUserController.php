@@ -11,8 +11,10 @@ class RootUserController extends Controller
     public function actionInit()
     {
         $user = User::findByUsername('root');
+        $auth = Yii::$app->authManager;
         if ($user){
             $user->delete();
+            $auth->revokeAll($user);
         }
 
         $user = new User();
