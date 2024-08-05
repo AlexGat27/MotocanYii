@@ -13,11 +13,20 @@ class RootModelController extends Controller
         $brandName = "Тестовая марка";
         $modelName = "Тестовая модель";
 
+        $brand = Brands::findOne(1);
+        if ($brand){
+            $brand->delete();
+        }
+
         $brand = new Brands();
         $brand->id = 1;
         $brand->name = $brandName;
 
         if ($brand->save()) {
+            $model = Models::findOne(1);
+            if ($model){
+                $model->delete();
+            }
             $model = new Models();
             $model->id = 1;
             $model->name = $modelName;
