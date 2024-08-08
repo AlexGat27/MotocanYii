@@ -125,7 +125,7 @@ class ScenarioController extends Controller
         $postData = Yii::$app->request->getBodyParams();
 
         if (isset($postData['jsonData'])) {
-            $scenario->jsonData = $postData['jsonData'];
+            $scenario->jsonData = json_encode($postData['jsonData']);
             $scenario->data = Yii::$app->arduinoConverter->processJsonData($postData['jsonData']);
         }
         if (isset($postData['model_id'])) {
