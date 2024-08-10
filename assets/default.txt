@@ -1,62 +1,71 @@
+/* КОНСТАНТА - КОНСТАНТА*/
 /*-----БИБЛИОТЕКИ-----*/
 #include "buttoon.h"
 #include "kontur.h"
-/*-----БИБЛИОТЕКИ-----*/
+#include "ConditionChecker.h"
+/*-----БИБЛИОТЕКИ-----*/   
 
-/*--------ВХОД-ВЫХОД--------*/
-const uint8_t numAnalogPins = 16;  // Общее количество аналоговых пинов
-const uint8_t numKonturPins = 8;   // Общее количество цифровых пинов (количество контуров)
-/*--------ВХОД-ВЫХОД--------*/
+bool photo;
+uint32_t lastPhTime;
 
 Buttoon buttons[] = {
-  Buttoon(A0),
-  Buttoon(A1),
   Buttoon(A2),
-  Buttoon(A3)
+  Buttoon(A3),
+  Buttoon(A4),
+  Buttoon(A5),
+  Buttoon(A6),
+  Buttoon(A7),
+  Buttoon(A8),
+  Buttoon(A9),
+  Buttoon(A10),
+  Buttoon(3),
+  Buttoon(18),
+  Buttoon(19),
+  Buttoon(20),
+  Buttoon(21)
 };
 
 kontur konturs[] = {
-  kontur(3),
   kontur(4),
   kontur(5),
   kontur(6),
+  kontur(7),
+  kontur(8),
   kontur(9)
 };
-/*
-isPressed(numPresses, interval);  //isPressed(КОЛИЧЕСТВО НАЖАТИЙ, ВРЕМЯ ПРОВЕРКИ(ИНТЕРВАЛ))
-isHold(interval);                 //isHold(ВРЕМЯ УДЕРЖИВАНИЯ КНОПКИ)
-isHold(interval, state);          //по умолчанию state = 0(можно вызвать - isHold(ВРЕМЯ УДЕРЖИВАНИЯ КНОПКИ) )
-                                  //если state = 1, то функция возвращает 1 дважды, то есть удерживаем кнопку - получаем 1, отпустили кнопку - получаем 1
+/* КОНСТАНТА - КОНСТАНТА*/
 
-turnON(power, delayTime = 0);                      //включить контур ( мощность, и время(по умолчанию 0) через которое включится контур)
-turnOFF(delayTime = 0);                            //выключить контур (время(по умолчанию 0) через которое выключится контур)
-blink(onTime, offTime, power);                     //мигание контуром ( включенное время, выключенное время, мощность) - мигает бесконечно
-blinkInPeriod(onTime, offTime, blinkTime, power);  //мигание контуром ( включенное время, выключенное время, время работы, мощность) - мигает в течение "время работы"
-toggle(power);                                     //включить/выключить контур; если включен, то выключаем, и наоборот
-cancel(void);                                      //выключить контур
-getOnOff(void);                                    //получить значение контура включен/выключен
-*/
+/* вот тут ты уже меняешь количество условий (переменная conDinNum)*/
+const uint8_t conDinNum = 0;  //количество условий
+ConditionChecker con[conDinNum];
 void setup() {
+  /* КОНСТАНТА - КОНСТАНТА*/
+  for (uint8_t i = 0; i < conDinNum; i++) {
+    con[i] = ConditionChecker();
+  }
+  /* КОНСТАНТА - КОНСТАНТА*/
   Serial.begin(9600);
-  pinMode(A6, INPUT);
+  pinMode(A0, INPUT);
+  pinMode(A1, OUTPUT);
+  digitalWrite(A1, 1);
 }
-#include "ConditionChecker.h"
-int countCon = 0;
-ConditionChecker con[countCon];  
+
 void loop() {
 
-  newUpdate();  
+  newUpdate();
 }
+
+/* КОНСТАНТА - КОНСТАНТА*/
 /*----- НАСТРОЙКА ФОТОРЕЗИСТОРА ДЕНЬ/НОЧЬ-----------*/
-bool pjoto;
 bool day_night(int16_t photoRes) {
-  if (analogRead(A6) < photoRes) {
-    pjoto = 0;
-  } else if (analogRead(A6) > (photoRes + 200)) {
-    pjoto = 1;
+  if (analogRead(A0) > photoRes) {
+    photo = 1;
+    lastPhTime = millis();
   }
-  //return (analogRead(A6) < photoRes) ? 0 : 1;
-  return pjoto;
+  if (millis() - lastPhTime > 5000 && analogRead(A0) < photoRes) {
+    photo = 0;
+  }
+  return photo;
 }
 /*----- НАСТРОЙКА ФОТОРЕЗИСТОРА ДЕНЬ/НОЧЬ-----------*/
 void newUpdate() {
@@ -65,25 +74,22 @@ void newUpdate() {
   konturs[2].loop();
   konturs[3].loop();
   konturs[4].loop();
-  /*konturs[5].loop();
+  konturs[5].loop();
   konturs[6].loop();
-  konturs[7].loop();*/
+  konturs[7].loop();
   buttons[0].update();
   buttons[1].update();
   buttons[2].update();
   buttons[3].update();
-  /*buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();
-  buttons[0].update();*/
+  buttons[4].update();
+  buttons[5].update();
+  buttons[6].update();
+  buttons[7].update();
+  buttons[8].update();
+  buttons[9].update();
+  buttons[10].update();
+  buttons[11].update();
+  buttons[12].update();
+  buttons[13].update();
 }
+/* КОНСТАНТА - КОНСТАНТА*/

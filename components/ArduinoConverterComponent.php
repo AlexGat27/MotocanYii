@@ -28,7 +28,7 @@ class ArduinoConverterComponent extends Component
         $conIndex = 0;
 
         // Replace the countCon value
-        $fileString = preg_replace('/int countCon = (\d+);/', 'int countCon = ' . $data['countContainers'] . ';', $fileString);
+        $fileString = preg_replace('/uint8_t conDinNum = (\d+);/', 'uint8_t conDinNum = ' . $data['countContainers'] . ';', $fileString);
 
         foreach ($data['contours'] as $contour) {
             foreach ($contour['containers'] as $container) {
