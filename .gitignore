@@ -34,5 +34,7 @@ tests/_support/_generated
 
 runtime/
 /runtime
+runtime/*
 .data
 .db
+*.db

@@ -35,19 +35,21 @@ class ArduinoConverterComponent extends Component
                 $this->_createConditionStringRecord($container, $updatedLoopContent, $conIndex);
                 $updatedLoopContent .= "   if (con[$conIndex].getKontState() == KONT_ON){\n";
                 $this->_createActionStringRecord($container, $conIndex, $updatedLoopContent);
-                $updatedLoopContent .= "   }else if (con[$conIndex].getKontState() == KONT_OFF) {
+                if ($container['actionCases'][0]['action'] != "Включить/Выключить"){
+                    $updatedLoopContent .= "   }else if (con[$conIndex].getKontState() == KONT_OFF) {
       kontours[" . $conIndex . "].turnOFF();\n   }\n\n";
+                } else{
+                    $updatedLoopContent .= "   }\n\n";
+                }
                 $conIndex++;
             }
         }
-
         // Update the loop function content
         $match = [];
         if (preg_match('/void loop\(\) \{([\s\S]*?)newUpdate\(\);/', $fileString, $match)) {
             $updatedContent = preg_replace('/void loop\(\) \{([\s\S]*?)newUpdate\(\);/', "void loop() {\n$updatedLoopContent\n   newUpdate();", $fileString);
             return bin2hex($updatedContent);
         }
-
         return false;
     }
 
