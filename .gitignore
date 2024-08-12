@@ -33,4 +33,6 @@ tests/_support/_generated
 /.vagrant
 
 runtime/
-*.db
+/runtime
+.data
+.db
