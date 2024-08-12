@@ -58,12 +58,12 @@ class ArduinoConverterComponent extends Component
                 $con = $container['conditionCases'][0];
                 if ($con['condition'] === "Сухой контакт") {
                     $updatedLoopContent .= intval($con['countSignals']) ?
-                        "   con[$conIndex].checkOneValue(buttons[" . $con['value'] . "].isPressed(" . $con['countSignals'] . ", " . $con['delay']['value'] . "));\n" :
-                        "   con[$conIndex].checkOneValue(buttons[" . $con['value'] . "].isHold(" . $con['delay']['value'] . "));\n";
+                        "   con[$conIndex].checkOneValue(buttons[" . $con['value'] . "].isPressed(" . $con['countSignals'] . ", " . $con['delay']['value'] . "000));\n" :
+                        "   con[$conIndex].checkOneValue(buttons[" . $con['value'] . "].isHold(" . $con['delay']['value'] . "000));\n";
                 } else if ($con['condition'] === "Фоторезистор") {
                     $updatedLoopContent .= $con['value'] === "День" ?
-                        "   con[$conIndex].checkOneValue(day_night(" . $con['delay']['value'] . "));\n" :
-                        "   con[$conIndex].checkOneValue(!day_night(" . $con['delay']['value'] . "));\n";
+                        "   con[$conIndex].checkOneValue(day_night(" . $con['delay']['value'] . "000));\n" :
+                        "   con[$conIndex].checkOneValue(!day_night(" . $con['delay']['value'] . "000));\n";
                 }
                 break;
             case 2:
@@ -71,11 +71,11 @@ class ArduinoConverterComponent extends Component
                 foreach ($container['conditionCases'] as $con) {
                     if ($con['condition'] === "Сухой контакт") {
                         $updatedLoopContent .= intval($con['countSignals']) ?
-                            "buttons[" . $con['value'] . "].isPressed(" . $con['countSignals'] . ", " . $con['delay']['value'] . "), " :
-                            "buttons[" . $con['value'] . "].isHold(" . $con['delay']['value'] . "), ";
+                            "buttons[" . $con['value'] . "].isPressed(" . $con['countSignals'] . ", " . $con['delay']['value'] . "000), " :
+                            "buttons[" . $con['value'] . "].isHold(" . $con['delay']['value'] . "000), ";
                     } else if ($con['condition'] === "Фоторезистор") {
                         $updatedLoopContent .= $con['value'] === "День" ?
-                            "day_night(" . $con['delay']['value'] . "), " : "!day_night(" . $con['delay']['value'] . "), ";
+                            "day_night(" . $con['delay']['value'] . "), " : "!day_night(" . $con['delay']['value'] . "000), ";
                     }
                 }
                 $updatedLoopContent = rtrim($updatedLoopContent, ", ") . ");\n";
@@ -85,11 +85,11 @@ class ArduinoConverterComponent extends Component
                 foreach ($container['conditionCases'] as $con) {
                     if ($con['condition'] === "Сухой контакт") {
                         $updatedLoopContent .= intval($con['countSignals']) ?
-                            "buttons[" . $con['value'] . "].isPressed(" . $con['countSignals'] . ", " . $con['delay']['value'] . "), " :
+                            "buttons[" . $con['value'] . "].isPressed(" . $con['countSignals'] . ", " . $con['delay']['value'] . "000), " :
                             "buttons[" . $con['value'] . "].isHold(" . $con['delay']['value'] . "), ";
                     } else if ($con['condition'] === "Фоторезистор") {
                         $updatedLoopContent .= $con['value'] === "День" ?
-                            "day_night(" . $con['delay']['value'] . "), " : "!day_night(" . $con['delay']['value'] . "), ";
+                            "day_night(" . $con['delay']['value'] . "), " : "!day_night(" . $con['delay']['value'] . "000), ";
                     }
                 }
                 $updatedLoopContent = rtrim($updatedLoopContent, ", ") . ");\n";
@@ -105,13 +105,13 @@ class ArduinoConverterComponent extends Component
             switch ($act['action']) {
                 case "Включить":
                     $updatedLoopContent .= "      kontours[$contourID].turnON(" . $act['power'] . ");\n";
-                    $updatedLoopContent .= "      kontours[$contourID].turnOFF(" . $act['workingPeriod'] . ");\n";
+                    $updatedLoopContent .= "      kontours[$contourID].turnOFF(" . $act['workingPeriod'] . "000);\n";
                     break;
                 case "Мигать":
                     if ($act['workingPeriod'] === "Постоянно" || $act['workingPeriod'] === '') {
                         $updatedLoopContent .= "      kontours[$contourID].blink(" . $act['interruption'] . ", " . $act['interruption'] . ", " . $act['power'] . ");\n";
                     } else {
-                        $updatedLoopContent .= "      kontours[$contourID].blinkInPeriod(" . $act['interruption'] . ", " . $act['interruption'] . ", " . $act['workingPeriod'] . ", " . $act['power'] . ");\n";
+                        $updatedLoopContent .= "      kontours[$contourID].blinkInPeriod(" . $act['interruption'] . ", " . $act['interruption'] . ", " . $act['workingPeriod'] . "000, " . $act['power'] . ");\n";
                     }
                     break;
                 case "Выключить":
