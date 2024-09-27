@@ -41,7 +41,6 @@ class CanCommands extends \yii\db\ActiveRecord
             [['name', 'command_id', 'model_id', 'byte_1', 'byte_2', 'byte_3', 'byte_4', 'byte_5', 'byte_6', 'byte_7', 'byte_8'], 'required'],
             [['model_id', 'byte_1', 'byte_2', 'byte_3', 'byte_4', 'byte_5', 'byte_6', 'byte_7', 'byte_8'], 'integer'],
             [['name', 'command_id'], 'string', 'max' => 255],
-            [['command_id'], 'unique'],
             [['model_id'], 'exist', 'skipOnError' => true, 'targetClass' => Models::class, 'targetAttribute' => ['model_id' => 'id']],
         ];
     }
