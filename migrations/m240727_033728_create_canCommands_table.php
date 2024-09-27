@@ -15,7 +15,7 @@ class m240727_033728_create_canCommands_table extends Migration
         $this->createTable('{{%canCommands}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
-            'command_id' => $this->string()->notNull()->unique(),
+            'command_id' => $this->string()->notNull(),
             'model_id' => $this->integer()->notNull(),
             'byte_1' => $this->integer()->notNull()->unsigned(),
             'byte_2' => $this->integer()->notNull()->unsigned(),
